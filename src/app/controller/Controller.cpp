@@ -21,7 +21,6 @@ void Controller::setup() {
         Message msg;
         msg.type = MessageKeypadPress;
         msg.data = key;
-        Serial.println(key);
         xQueueSend(_q, &msg, 10);
     };
     Wire.setClock(400000);
@@ -33,15 +32,16 @@ void Controller::setup() {
     //State Machine Setup
     _machine = FlowBendingMachine::getInstance();
     auto onChangedCallback = [&](std::unordered_map<std::string, std::string> data) {
-        Serial.printf("state: %s\n\r", data["state"]);
+        Serial.printf("state: %s\n\r", data["state"].c_str());
         std::string param = "param_0";
-        Serial.printf("param: ");
         for(int i = 0; i < 9; i++) {
             param[6] = '0' + i;
             if (data.find(param) == data.end())
                 break;
-            Serial.printf("%d=%s", i, data[param]);
+            Serial.printf("param_%d=%s, ", i, data[param].c_str());
         }
+        Serial.printf("\n\r");
+
         Serial.printf("\n\r");
     };
     auto timeoutCallback = [&](const int signal) {

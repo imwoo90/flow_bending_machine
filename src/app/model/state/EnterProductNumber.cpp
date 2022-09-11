@@ -30,7 +30,7 @@ void EnterProductNumber::initialize() {
     // init data
     data.clear();
     data["state"] = "EnterProductNumber";
-    data["param_0"] = "";
+    data["param_0"] = "000";
 
     //key timout start
     xTimerStart(_timer, 0);

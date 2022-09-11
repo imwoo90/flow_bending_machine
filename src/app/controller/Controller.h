@@ -12,12 +12,14 @@ private:
     QueueHandle_t _q;
     FlowBendingMachine* _machine;
     Keypad_4x3* _keypad;
+    Controller() {}
 public:
+    static Controller* getInstance() {
+        static Controller singleton_instance;
+        return &singleton_instance;
+    }
     void setup();
     void loop();
 };
-
-
-extern Controller flowBendingMachineController;
 
 #endif

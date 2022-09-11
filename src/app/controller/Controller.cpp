@@ -71,7 +71,3 @@ void Controller::loop() {
         break;
     }
 }
-
-
-Controller flowBendingMachineController;
-

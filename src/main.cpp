@@ -1,13 +1,15 @@
 #include <Controller.h>
 
+Controller* ctr;
 void setup()
 {
-  flowBendingMachineController.setup();
+  ctr = Controller::getInstance();
+  ctr->setup();
 }
 
 void loop()
 {
-  flowBendingMachineController.loop();
+  ctr->loop();
 }
 
 // /*

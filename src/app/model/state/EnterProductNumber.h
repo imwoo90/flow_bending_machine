@@ -1,5 +1,5 @@
-#ifndef ENTER_PRODUCT_NUMBER_H
-#define ENTER_PRODUCT_NUMBER_H
+#pragma once
+
 #include <FreeRTOS.h>
 #include <timers.h>
 
@@ -16,5 +16,3 @@ public:
     virtual MachineState* pressKey(const char key);
     virtual MachineState* timeout(const int signal);
 };
-
-#endif

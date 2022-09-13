@@ -30,7 +30,7 @@ void Controller::setup() {
     _keypad->subscribe(keypadCallback);
 
     //State Machine Setup
-    _machine = FlowBendingMachine::getInstance();
+    _machine = FlowVendingMachine::getInstance();
     auto onChangedCallback = [&](std::unordered_map<std::string, std::string> data) {
         Serial.printf("state: %s\n\r", data["state"].c_str());
         std::string param = "param_0";

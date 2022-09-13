@@ -1,5 +1,6 @@
 #include "EnterProductNumber.h"
 #include "Selling.h"
+#include "EnterPasswordOfSystemSetting.h"
 
 static void keyTimeoutCallBack( TimerHandle_t xTimer ) {
     MachineState::_timeoutCallback(0);
@@ -28,9 +29,9 @@ EnterProductNumber::EnterProductNumber() {
 
 void EnterProductNumber::initialize() {
     // init data
-    data.clear();
-    data["state"] = "EnterProductNumber";
-    data["param_0"] = "000";
+    _data.clear();
+    _data["state"] = "EnterProductNumber";
+    _data["param_0"] = "000";
 
     //key timout start
     xTimerStart(_timer, 0);
@@ -49,23 +50,27 @@ MachineState* EnterProductNumber::pressKey(const char key) {
 
     MachineState* next = this;
     switch ( key ) {
-    case '#':
-        xTimerStart(_timer, 0);
-        break;
-    case '*':
-        next = Selling::getInstance();
-        break;
-    default: //1~9
-        std::string &param_0 = data["param_0"];
-        if(param_0.length() == 3) {
-            param_0[0] = param_0[1];
-            param_0[1] = param_0[2];
-            param_0[2] = key;
-        } else {
-            param_0.push_back(key);
+    case '#': {
+        std::string &param_0 = _data["param_0"];
+        int n = std::stoi(param_0);
+        if ( n < _database->getNumberOfColumns() ) {
+            //check goods number
+            n -= 1; //change goods number
+        } else if ( n == _database->getPasswordOfSystemManagement() ){
+            next = EnterPasswordOfSystemSetting::getInstance();
+            break;
         }
         xTimerStart(_timer, 0);
-        break;
+        break;}
+    case '*': {
+        next = Selling::getInstance();
+        break;}
+    default: {//1~9
+        std::string &param_0 = _data["param_0"];
+        rotate(param_0.begin(), param_0.begin()+1, param_0.end());
+        param_0[param_0.length()-1] = key;
+        xTimerStart(_timer, 0);
+        break;}
     }
     return next;
 }

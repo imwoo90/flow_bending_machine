@@ -1,10 +1,11 @@
 #include "Selling.h"
+
 #include "EnterProductNumber.h"
 
 void Selling::initialize() {
     // init data
-    data.clear();
-    data["state"] = "Selling";
+    _data.clear();
+    _data["state"] = "Selling";
 }
 
 Selling* Selling::getInstance() {

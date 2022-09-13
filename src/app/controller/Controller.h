@@ -4,13 +4,13 @@
 #include <queue.h>
 
 #include <Arduino.h>
-#include <FlowBendingMachine.h>
+#include <FlowVendingMachine.h>
 #include <device/Keypad_4x3/Keypad_4x3.h>
 
 class Controller {
 private:
     QueueHandle_t _q;
-    FlowBendingMachine* _machine;
+    FlowVendingMachine* _machine;
     Keypad_4x3* _keypad;
     Controller() {}
 public:

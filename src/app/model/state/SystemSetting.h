@@ -3,12 +3,12 @@
 #include <MachineState.h>
 #include <MachineData.h>
 
-class Selling : public MachineState {
+class SystemSetting : public MachineState {
 private:
-    Selling() {}
+    SystemSetting() {}
     virtual void initialize();
 public:
-    static Selling* getInstance();
+    static SystemSetting* getInstance();
 
     virtual MachineState* pressKey(const char key);
 };

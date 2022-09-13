@@ -1,9 +1,9 @@
-#ifndef MACHINE_STATE_H
-#define MACHINE_STATE_H
+#pragma once
 
 #include <Arduino.h>
-#include <functional>
+#include <MachineData.h>
 
+#include <functional>
 #include <unordered_map>
 #include <string>
 #include <vector>
@@ -15,12 +15,11 @@ public:
     static std::function<void(const int)> _timeoutCallback;
     static std::function<void(std::unordered_map<std::string, std::string>)> _onChangedCallback;
 
-    std::unordered_map<std::string, std::string> data;
+    static std::unordered_map<std::string, std::string> _data;
+    static MachineData* _database;
 
     virtual MachineState* pressKey(const char key) { return this;}
     virtual MachineState* releaseKey(const char key) {return this;}
     virtual MachineState* recognizeBanknote(const int Banknote) {return this;}
     virtual MachineState* timeout(const int signal) {return this;}
 };
-
-#endif

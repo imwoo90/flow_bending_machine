@@ -9,6 +9,8 @@ bool EnterPasswordOfManualSales::isMatched(int password) {
 
 MachineState* EnterPasswordOfManualSales::decide() {
     if (_isChangePasswords) {
+        int password = std::stoi(_data["param_0"]);
+        _database->setPasswordOfManualSales(password);
         return this;
     }
     return ManualSales::getInstance();
@@ -16,7 +18,7 @@ MachineState* EnterPasswordOfManualSales::decide() {
 
 MachineState* EnterPasswordOfManualSales::cancel() {
     if (_isChangePasswords) {
-        return this;
+        return PasswordChange::getInstance();
     }
     return SystemSetting::getInstance();;
 }

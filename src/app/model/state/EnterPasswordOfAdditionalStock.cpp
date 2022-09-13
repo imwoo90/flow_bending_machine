@@ -7,6 +7,8 @@ bool EnterPasswordOfAdditionalStock::isMatched(int password) {
 
 MachineState* EnterPasswordOfAdditionalStock::decide() {
     if (_isChangePasswords) {
+        int password = std::stoi(_data["param_0"]);
+        _database->setPasswordOfAdditionalStock(password);
         return this;
     }
     return this;
@@ -14,7 +16,7 @@ MachineState* EnterPasswordOfAdditionalStock::decide() {
 
 MachineState* EnterPasswordOfAdditionalStock::cancel() {
     if (_isChangePasswords) {
-        return this;
+        return PasswordChange::getInstance();
     }
     return SystemSetting::getInstance();;
 }

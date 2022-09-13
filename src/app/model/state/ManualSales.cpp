@@ -18,13 +18,14 @@ ManualSales* ManualSales::getInstance() {
 }
 
 MachineState* ManualSales::pressKey(const char key) {
+    int column;
     MachineState* next = this;
     switch ( key ) {
     case '*':
         next = SystemSetting::getInstance();
         break;
     case '#':
-        int column = std::stoi(_data["param_0"]);
+        column = std::stoi(_data["param_0"]);
         if ( column < _database->getNumberOfColumns() ) {
             // Not implemented yet
         }

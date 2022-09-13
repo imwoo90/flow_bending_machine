@@ -9,6 +9,8 @@ bool EnterPasswordOfSystemSetting::isMatched(int password) {
 
 MachineState* EnterPasswordOfSystemSetting::decide() {
     if (_isChangePasswords) {
+        int password = std::stoi(_data["param_0"]);
+        _database->setPasswordOfSystemSetting(password);
         return this;
     }
     return SystemSetting::getInstance();
@@ -16,7 +18,7 @@ MachineState* EnterPasswordOfSystemSetting::decide() {
 
 MachineState* EnterPasswordOfSystemSetting::cancel() {
     if (_isChangePasswords) {
-        return this;
+        return PasswordChange::getInstance();
     }
     return Selling::getInstance();
 }

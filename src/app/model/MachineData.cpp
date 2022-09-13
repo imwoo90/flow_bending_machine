@@ -23,7 +23,7 @@ void MachineData::defineDefaultsData() {
     setPasswordOfAdditionalStock(123456);
     setPasswordOfManualSales(123456);
     setPasswordOfPasswordChange(123456);
-    setModeOfBanknoteReader(1);
+    setBanknoteReaderMode(1);
     setNumberOfRelay(numOfDefaultRelay);
     setMoneyOfTotalSales(0);
     setNumberOfTotalSales(0);
@@ -245,8 +245,8 @@ uint32_t MachineData::getPasswordOfManualSales() {
 uint32_t MachineData::getPasswordOfPasswordChange() {
     return getStaticData(PasswordOfPasswordChange);
 }
-uint32_t MachineData::getModeOfBanknoteReader() {
-    return getStaticData(ModeOfBanknoteReader);
+uint32_t MachineData::getBanknoteReaderMode() {
+    return getStaticData(BanknoteReaderMode);
 }
 uint32_t MachineData::getNumberOfRelay() {
     return getStaticData(NumberOfRelay);
@@ -284,8 +284,8 @@ void MachineData::setPasswordOfManualSales(uint32_t password) {
 void MachineData::setPasswordOfPasswordChange(uint32_t password) {
     setStaticData(PasswordOfPasswordChange, password);
 }
-void MachineData::setModeOfBanknoteReader(uint32_t mode) {
-    setStaticData(ModeOfBanknoteReader, mode);
+void MachineData::setBanknoteReaderMode(uint32_t mode) {
+    setStaticData(BanknoteReaderMode, mode);
 }
 void MachineData::setNumberOfRelay(uint32_t number) {
     if ( _numberOfRelays == number )

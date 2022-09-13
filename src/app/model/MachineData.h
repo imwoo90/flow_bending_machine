@@ -23,8 +23,8 @@ typedef enum {
     PasswordOfAdditionalStock = PasswordOfMainManagement+4,
     PasswordOfManualSales = PasswordOfAdditionalStock+4,
     PasswordOfPasswordChange = PasswordOfManualSales+4,
-    ModeOfBanknoteReader = PasswordOfPasswordChange+4,
-    NumberOfRelay = ModeOfBanknoteReader+4,
+    BanknoteReaderMode = PasswordOfPasswordChange+4,
+    NumberOfRelay = BanknoteReaderMode+4,
     MoneyOfTotalSales = NumberOfRelay+4,
     NumberOfTotalSales = MoneyOfTotalSales+4,
     MoneyOfManualSales = NumberOfTotalSales+4,
@@ -86,7 +86,7 @@ public:
     uint32_t getPasswordOfAdditionalStock();
     uint32_t getPasswordOfManualSales();
     uint32_t getPasswordOfPasswordChange();
-    uint32_t getModeOfBanknoteReader();
+    uint32_t getBanknoteReaderMode();
     uint32_t getNumberOfRelay();
     uint32_t getMoneyOfTotalSales();
     uint32_t getNumberOfTotalSales();
@@ -99,7 +99,7 @@ public:
     void setPasswordOfAdditionalStock(uint32_t password);
     void setPasswordOfManualSales(uint32_t password);
     void setPasswordOfPasswordChange(uint32_t password);
-    void setModeOfBanknoteReader(uint32_t mode);
+    void setBanknoteReaderMode(uint32_t mode);
     void setNumberOfRelay(uint32_t number);
     void setMoneyOfTotalSales(uint32_t money);
     void setNumberOfTotalSales(uint32_t number);

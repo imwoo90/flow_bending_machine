@@ -9,6 +9,8 @@ bool EnterPasswordOfMainManagement::isMatched(int password) {
 
 MachineState* EnterPasswordOfMainManagement::decide() {
     if (_isChangePasswords) {
+        int password = std::stoi(_data["param_0"]);
+        _database->setPasswordOfMainManagement(password);
         return this;
     }
     return MainManagement::getInstance();
@@ -16,7 +18,7 @@ MachineState* EnterPasswordOfMainManagement::decide() {
 
 MachineState* EnterPasswordOfMainManagement::cancel() {
     if (_isChangePasswords) {
-        return this;
+        return PasswordChange::getInstance();
     }
     return SystemSetting::getInstance();
 }

@@ -2,6 +2,14 @@
 
 #include "SystemSetting.h"
 
+#include "BanknoteReaderModeSetting.h"
+#include "NumberOfRelaySetting.h"
+#include "NumberOfChannelSetting.h"
+#include "MotorTypeSetting.h"
+#include "MatchingChannelAndColumn.h"
+#include "EnterPasswordOfPasswordChange.h"
+#include "ListOfColumnData.h"
+
 void VendingMachineModeSetting::initialize() {
     // init data
     _data.clear();
@@ -21,25 +29,25 @@ MachineState* VendingMachineModeSetting::pressKey(const char key) {
         next = SystemSetting::getInstance();
         break;
     case '1':
-        // Not implemented yet
+        next = BanknoteReaderModeSetting::getInstance();
         break;
     case '2':
-        // Not implemented yet
+        next = NumberOfRelaySetting::getInstance();
         break;
     case '3':
-        // Not implemented yet
+        next = NumberOfChannelSetting::getInstance();
         break;
     case '4':
-        // Not implemented yet
+        next = MotorTypeSetting::getInstance();
         break;
     case '5':
-        // Not implemented yet
+        next = MatchingChannelAndColumn::getInstance();
         break;
     case '6':
-        // Not implemented yet
+        next = EnterPasswordOfPasswordChange::getInstance();
         break;
     case '7':
-        // Not implemented yet
+        next = ListOfColumnData::getInstance();
         break;
     }
     return next;

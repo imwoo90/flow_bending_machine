@@ -2,7 +2,7 @@
 
 #include <MachineState.h>
 #include <MachineData.h>
-
+#include "PasswordChange.h"
 class EnterPassword : public MachineState {
 private:
     virtual bool isMatched(int password) = 0;

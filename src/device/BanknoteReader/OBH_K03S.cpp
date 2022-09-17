@@ -17,7 +17,7 @@ OBH_K03S::OBH_K03S(Stream &serial) {
     _serial = &serial;
 }
 
-int OBH_K03S::initialized(const char* taskName = "OBH_K03S") {
+int OBH_K03S::initialized(const char* taskName) {
     char _buf[5];
     //reset
     char cmd[3] = {'R', 'S', 'T'};

@@ -37,7 +37,7 @@ protected:
     virtual int getBilldata();
 public:
     OBH_K03S(Stream &serial);
-    virtual int initialized(const char* taskName);
+    virtual int initialized(const char* taskName = "OBH_K03S");
     virtual void enable();
     virtual void disable();
 };

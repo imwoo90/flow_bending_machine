@@ -9,13 +9,13 @@ static void banknoteEventTask(void *params) {
 
 void BanknoteReader::notifyBillData() {
     int billdata = getBillData();
-    for (auto cb : _buillDataCallbacks) {
+    for (auto cb : _onRecognizedBankNotes) {
         cb(billdata);
     }
 }
 
-void BanknoteReader::registerBillDataCallBack(std::function<void(const int)> billdata) {
-    _buillDataCallbacks.push_back(billdata);
+void BanknoteReader::registerBillDataCallBack(std::function<void(const int)> onRecognizedBankNote) {
+    _onRecognizedBankNotes.push_back(onRecognizedBankNote);
 }
 
 int BanknoteReader::initialized(const char* taskName) {

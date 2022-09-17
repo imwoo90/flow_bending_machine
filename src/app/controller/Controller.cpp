@@ -1,4 +1,5 @@
 #include <Controller.h>
+#include <SoftwareSerial.h>
 
 typedef enum {
     MessageKeypadPress,
@@ -12,11 +13,7 @@ struct Message {
     int data;
 };
 
-void Controller::setup() {
-    // Controller loop Queue Create
-    _q = xQueueCreate(16, sizeof(Message));
-
-    //Keypad setup
+int Controller::setupKeypad() {
     auto keypadCallback = [&](const char key) {
         Message msg;
         msg.type = MessageKeypadPress;
@@ -28,8 +25,21 @@ void Controller::setup() {
     Wire.setSDA(16);
     _keypad = Keypad_4x3::getInstance();
     _keypad->subscribe(keypadCallback);
+    return 0;
+}
 
-    //State Machine Setup
+int Controller::setupKBankNoteReader() {
+    static SoftwareSerial ssBankNote(2, 3);
+
+    return 0;
+}
+
+int setupMotor() {
+
+    return 0;
+}
+
+int Controller::setupModel() {
     _machine = FlowVendingMachine::getInstance();
     auto onChangedCallback = [&](std::unordered_map<std::string, std::string> data) {
         Serial.printf("state: %s\n\r", data["state"].c_str());
@@ -51,6 +61,19 @@ void Controller::setup() {
         xQueueSend(_q, &msg, 10);
     };
     _machine->begin(1, onChangedCallback, timeoutCallback);
+
+    return 0;
+}
+
+void Controller::setup() {
+    // Controller loop Queue Create
+    _q = xQueueCreate(16, sizeof(Message));
+
+    // Setup device
+    setupKeypad();
+    setupKBankNoteReader();
+
+    setupModel();
 }
 
 void Controller::loop() {

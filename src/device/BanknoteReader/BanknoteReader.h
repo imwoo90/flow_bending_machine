@@ -10,15 +10,14 @@ class BanknoteReader {
 private:
     std::vector<std::function<void(const int)> > _onRecognizedBankNotes;
     TaskHandle_t _eventTask;
-protected:
-    virtual int getBillData();
 public:
     void notifyBillData();
 
     void registerBillDataCallBack(std::function<void(const int)> onRecognizedBankNote);
     virtual int initialized(const char* taskName);
-    virtual void enable();
-    virtual void disable();
+    virtual void enable() = 0;
+    virtual void disable() = 0;
+    virtual int getBillData() = 0;
 };
 
 #endif

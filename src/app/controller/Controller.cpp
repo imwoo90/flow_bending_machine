@@ -30,7 +30,19 @@ int Controller::setupKeypad() {
 
 int Controller::setupKBankNoteReader() {
     static SoftwareSerial ssBankNote(2, 3);
+    ssBankNote.setTimeout(ULONG_MAX);
+    ssBankNote.begin(9600);
 
+    _bankNoteReader = OBH_K03S::getInstance(ssBankNote);
+    auto onRecognizedBankNote = [&](const int billData) {
+        Message msg;
+        msg.type = MessageBanknoteRecognize;
+        msg.data = billData*1000;
+        xQueueSend(_q, &msg, 10);
+    };
+
+    _bankNoteReader->registerBillDataCallBack(onRecognizedBankNote);
+    _bankNoteReader->initialized("OBH_K03S");
     return 0;
 }
 
@@ -51,7 +63,6 @@ int Controller::setupModel() {
             Serial.printf("param_%d=%s, ", i, data[param].c_str());
         }
         Serial.printf("\n\r");
-
         Serial.printf("\n\r");
     };
     auto timeoutCallback = [&](const int signal) {
@@ -66,14 +77,14 @@ int Controller::setupModel() {
 }
 
 void Controller::setup() {
+    delay(5000);
     // Controller loop Queue Create
     _q = xQueueCreate(16, sizeof(Message));
+    setupModel();
 
     // Setup device
-    setupKeypad();
     setupKBankNoteReader();
-
-    setupModel();
+    setupKeypad();
 }
 
 void Controller::loop() {

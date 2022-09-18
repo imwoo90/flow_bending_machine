@@ -1,6 +1,6 @@
 #include "OBH_K03S.h"
 
-#define checksum(x) (byte)(x[1]+x[2]+x[3])
+#define checksum(x) (byte)((x)[1]+(x)[2]+(x)[3])
 
 bool OBH_K03S::receiveCommnad(const char* _buf, const char* cmd) {
     return _buf[1] == cmd[0] && _buf[2] == cmd[1];
@@ -11,10 +11,7 @@ void OBH_K03S::sendCommand(const char* cmd) {
     };
     _buf[4] = checksum(_buf);
     _serial->write(_buf, 5);
-}
-
-OBH_K03S::OBH_K03S(Stream &serial) {
-    _serial = &serial;
+    Serial.printf("%c %c %c %d %d\n\r", _buf[0], _buf[1], _buf[2], _buf[3], _buf[4]);
 }
 
 int OBH_K03S::initialized(const char* taskName) {
@@ -42,7 +39,7 @@ int OBH_K03S::initialized(const char* taskName) {
     return 0;
 }
 
-int OBH_K03S::getBilldata() {
+int OBH_K03S::getBillData() {
     char _buf[5];
     while(1) {
         if (process(_buf) < 0)
@@ -67,6 +64,7 @@ void OBH_K03S::disable() {
 
 int OBH_K03S::process(char _buf[5]) {
     _serial->readBytes(_buf, 5);
+    Serial.printf("%c %c %c %d %d\n\r", _buf[0], _buf[1], _buf[2], _buf[3], _buf[4]);
     if (checksum(_buf) != _buf[4]) {
         Serial.println("OHB_K03S checksum error");
         return -1;
@@ -90,11 +88,17 @@ int OBH_K03S::process(char _buf[5]) {
 int OBH_K03S::activeStatusProcess(ActiveStatus reg) {
     switch (reg)
     {
-    case RECOGNITION_END:
+    case STACK_END:
         sendCommand("GB?");
         break;
     default:
         break;
     }
     return 0;
+}
+
+ OBH_K03S* OBH_K03S::getInstance(Stream &serial) {
+    static OBH_K03S singleton_instance;
+    singleton_instance._serial = &serial;
+    return &singleton_instance;
 }

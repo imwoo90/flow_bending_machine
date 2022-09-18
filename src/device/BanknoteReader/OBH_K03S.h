@@ -33,11 +33,12 @@ private:
     int activeStatusProcess(ActiveStatus reg);
     bool receiveCommnad(const char* _buf, const char* cmd);
     void sendCommand(const char*);
-protected:
-    virtual int getBilldata();
+    virtual int getBillData();
+
+    OBH_K03S() {};
 public:
-    OBH_K03S(Stream &serial);
-    virtual int initialized(const char* taskName = "OBH_K03S");
+    static OBH_K03S* getInstance(Stream &serial);
+    virtual int initialized(const char* taskName);
     virtual void enable();
     virtual void disable();
 };

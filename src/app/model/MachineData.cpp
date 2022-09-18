@@ -54,7 +54,6 @@ void MachineData::defineDefaultsData() {
     }
 }
 void MachineData::initialize() {
-    delay(5000);
     if ( !LittleFS.begin() ) {
         Serial.println("LittleFS.begin() failed");
         return;

@@ -46,7 +46,7 @@ int OBH_K03S::getBillData() {
             continue;
 
         if (receiveCommnad(_buf, "gb")) { //Receive BillData
-            return _buf[3];
+            return _buf[3]*1000;
         }
     }
     return -1;

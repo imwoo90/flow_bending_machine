@@ -7,6 +7,7 @@
 #include <FlowVendingMachine.h>
 #include <device/Keypad_4x3/Keypad_4x3.h>
 #include <device/BanknoteReader/OBH_K03S.h>
+#include <device/Relay/Relay.h>
 
 class Controller {
 private:
@@ -14,10 +15,11 @@ private:
     FlowVendingMachine* _machine;
     Keypad_4x3* _keypad;
     BanknoteReader* _bankNoteReader;
+    std::vector<Relay> _relays;
 
     int setupKeypad();
     int setupKBankNoteReader();
-    int setupMotor();
+    int setupRelays();
 
     int setupModel();
     Controller() {}

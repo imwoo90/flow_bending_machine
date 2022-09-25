@@ -8,9 +8,10 @@
 class FlowVendingMachine {
 private:
     MachineState* _state;
-    MachineData* _database;
     FlowVendingMachine() {}
 public:
+    MachineData* _database;
+
     void begin(bool isNormal, std::function<void(std::unordered_map<std::string, std::string>)> onChangedCallback, std::function<void(const int)> timeoutCallback);
     static FlowVendingMachine* getInstance() {
         static FlowVendingMachine singleton_instance;

@@ -20,6 +20,6 @@ public:
 
     virtual MachineState* pressKey(const char key) { return this;}
     virtual MachineState* releaseKey(const char key) {return this;}
-    virtual MachineState* recognizeBanknote(const int Banknote) {return this;}
+    virtual MachineState* recognizeBanknote(const int banknote) {return this;}
     virtual MachineState* timeout(const int signal) {return this;}
 };

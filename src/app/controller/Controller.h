@@ -11,6 +11,7 @@
 
 class Controller {
 private:
+    int _isInitOk = false;
     QueueHandle_t _q;
     FlowVendingMachine* _machine;
     Keypad_4x3* _keypad;

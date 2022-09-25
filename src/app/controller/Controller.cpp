@@ -26,6 +26,99 @@ int Controller::setupModel() {
         }
         Serial.printf("\n\r");
         Serial.printf("\n\r");
+
+        if (data["state"] == "Selling") {
+            if (_isInitOk) {
+                _bankNoteReader->disable();
+            }
+        } else if (data["state"] == "InputMoney") {
+            int column = std::stoi(data["param_2"]) - 1;
+            int price = _machine->_database->getPrice(column);
+            int inputMoney = std::stoi(data["param_0"]);
+            if (price <= inputMoney) {
+                int channel = _machine->_database->getChannel(column);
+                int numOfRelay = _machine->_database->getNumberOfRelays();
+                for (int i = 0; i < numOfRelay; i++) {
+                    int nc = _machine->_database->getNumberOfChannels(i);
+                    if (channel < nc) {
+                        _relays[i].open(channel);
+                        delay(1000);
+                        _relays[i].close(channel);
+                        break;
+                    }
+                    channel -= nc;
+                }
+            } else {
+                _bankNoteReader->enable();
+            }
+        } else if (data["state"] == "ColumnTestManul") {
+            if (data["param_0"] == "start") {
+                int column = std::stoi(data["param_1"]) - 1;
+                int channel = _machine->_database->getChannel(column);
+                int numOfRelay = _machine->_database->getNumberOfRelays();
+                for (int i = 0; i < numOfRelay; i++) {
+                    int nc = _machine->_database->getNumberOfChannels(i);
+                    if (channel < nc) {
+                        _relays[i].open(channel);
+                        delay(1000);
+                        _relays[i].close(channel);
+                        break;
+                    }
+                    channel -= nc;
+                }
+            }
+        } else if (data["state"] == "ColumnTestSection") {
+            if (data["param_0"] == "start") {
+                int column = std::stoi(data["param_1"]) - 1;
+                int nColumns = std::stoi(data["param_2"]) - 1;
+                int numOfRelay = _machine->_database->getNumberOfRelays();
+                std::vector<int> nChannels;
+                for(int i = 0; i < numOfRelay; i++) {
+                    int nc = _machine->_database->getNumberOfChannels(i);
+                    nChannels.push_back(nc);
+                }
+
+                for (int i = column; i <= nColumns; i++) {
+                    int channel = _machine->_database->getChannel(i);
+                    for(int j = 0; j < nChannels.size(); j++) {
+                        int nc = nChannels[j];
+                        if( channel < nc) {
+                            _relays[j].open(channel);
+                            delay(1000);
+                            _relays[j].close(channel);
+                            break;
+                        }
+                        channel -= nc;
+                    }
+                }
+            }
+        } else if (data["state"] == "ColumnTestAll") {
+            if (data["param_0"] == "start") {
+                int column = std::stoi(data["param_1"]) - 1;
+                int nColumns =  _machine->_database->getNumberOfColumns();
+                int numOfRelay = _machine->_database->getNumberOfRelays();
+                std::vector<int> nChannels;
+                for(int i = 0; i < numOfRelay; i++) {
+                    int nc = _machine->_database->getNumberOfChannels(i);
+                    nChannels.push_back(nc);
+                }
+
+                for (int i = column; i < nColumns; i++) {
+                    int channel = _machine->_database->getChannel(i);
+                    for(int j = 0; j < nChannels.size(); j++) {
+                        int nc = nChannels[j];
+                        if( channel < nc) {
+                            _relays[j].open(channel);
+                            delay(1000);
+                            _relays[j].close(channel);
+                            break;
+                        }
+                        channel -= nc;
+                    }
+                }
+            }
+        }
+
     };
     auto timeoutCallback = [&](const int signal) {
         Message msg;
@@ -109,8 +202,8 @@ int Controller::setupRelays() {
     Serial2.setRX(MAX485_RO);
     Serial2.setTX(MAX485_DI);
     Serial2.begin(9600);
-    for (int i = 0; i <= nRelays; i++) { // Unuser index 0
-        _relays.push_back(Relay(i, Serial2, preTx, postTx));
+    for (int i = 0; i < nRelays; i++) { //i + 1 is relay address
+        _relays.push_back(Relay(i+1, Serial2, preTx, postTx));
     }
 
     return 0;
@@ -126,6 +219,7 @@ void Controller::setup() {
     setupKBankNoteReader();
     setupKeypad();
     setupRelays();
+    _isInitOk = true;
 }
 
 void Controller::loop() {

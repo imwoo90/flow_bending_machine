@@ -10,9 +10,8 @@ MachineState* EnterPasswordOfPasswordChange::decide() {
     if (_isChangePasswords) {
         int password = std::stoi(_data["param_0"]);
         _database->setPasswordOfPasswordChange(password);
-        return PasswordChange::getInstance();
     }
-    return this;
+    return PasswordChange::getInstance();
 }
 
 MachineState* EnterPasswordOfPasswordChange::cancel() {

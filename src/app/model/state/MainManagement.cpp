@@ -1,6 +1,9 @@
 #include "MainManagement.h"
 
 #include "SystemSetting.h"
+#include "SalesInfo.h"
+#include "SetGoods.h"
+#include "SelectTest.h"
 
 void MainManagement::initialize() {
     // init data
@@ -21,13 +24,13 @@ MachineState* MainManagement::pressKey(const char key) {
         next = SystemSetting::getInstance();
         break;
     case '1':
-        // Not implemented yet
+        next = SalesInfo::getInstance();
         break;
     case '2':
-        // Not implemented yet
+        next = SetGoods::getInstance();
         break;
     case '3':
-        // Not implemented yet
+        next = SelectTest::getInstance();
         break;
     case '4':
         // Not implemented yet

@@ -7,13 +7,13 @@ Relay::Relay(uint8_t id, Stream &serial, void(*preTx)(), void(*postTx)()) {
 }
 
 uint8_t Relay::open(uint16_t addr) {
-    uint8_t ret = node.writeSingleRegister(addr, 0x0100);
+    uint8_t ret = node.writeSingleRegister(addr+1, 0x0100);
     delay(50);
     return ret;
 }
 
 uint8_t Relay::close(uint16_t addr) {
-    uint8_t ret = node.writeSingleRegister(addr, 0x0200);
+    uint8_t ret = node.writeSingleRegister(addr+1, 0x0200);
     delay(50);
     return ret;
 }

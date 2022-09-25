@@ -1,6 +1,7 @@
 #include "EnterProductNumber.h"
 #include "Selling.h"
 #include "EnterPasswordOfSystemSetting.h"
+#include "InputMoney.h"
 
 static void keyTimeoutCallBack( TimerHandle_t xTimer ) {
     MachineState::_timeoutCallback(0);
@@ -10,7 +11,7 @@ EnterProductNumber::EnterProductNumber() {
     _timer = xTimerCreate(
          /* Just a text name, not used by the RTOS
         kernel. */
-        "Timer",
+        "EnterProductNumber",
         /* The timer period in ticks, must be
         greater than 0. */
         pdMS_TO_TICKS(10*1000),
@@ -55,7 +56,11 @@ MachineState* EnterProductNumber::pressKey(const char key) {
         int n = std::stoi(param_0);
         if ( n < _database->getNumberOfColumns() ) {
             //check goods number
-            n -= 1; //change goods number
+            n -= 1; //change goods number == column number
+            if (_database->getQuantity(n) > 0) {
+                next =InputMoney::getInstance(n);
+            }
+            break;
         } else if ( n == _database->getPasswordOfSystemManagement() ){
             next = EnterPasswordOfSystemSetting::getInstance();
             break;

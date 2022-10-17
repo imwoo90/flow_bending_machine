@@ -18,11 +18,11 @@ void BanknoteReader::registerBillDataCallBack(std::function<void(const int)> onR
     _onRecognizedBankNotes.push_back(onRecognizedBankNote);
 }
 
-int BanknoteReader::initialized(const char* taskName) {
+int BanknoteReader::initialized() {
     enum {
         Priority = configMAX_PRIORITIES / 2 - 1,
     };
 
-    xTaskCreate(banknoteEventTask, taskName, 512, this, Priority, &_eventTask);
+    xTaskCreate(banknoteEventTask, _name.c_str(), 512, this, Priority, &_eventTask);
     return 0;
 }

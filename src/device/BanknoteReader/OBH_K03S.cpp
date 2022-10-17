@@ -14,7 +14,8 @@ void OBH_K03S::sendCommand(const char* cmd) {
     Serial.printf("%c %c %c %d %d\n\r", _buf[0], _buf[1], _buf[2], _buf[3], _buf[4]);
 }
 
-int OBH_K03S::initialized(const char* taskName) {
+int OBH_K03S::initialized() {
+    _serial->setTimeout(100);
     char _buf[5];
     //reset
     char cmd[3] = {'R', 'S', 'T'};
@@ -35,7 +36,9 @@ int OBH_K03S::initialized(const char* taskName) {
         Serial.println("OHB_K03S config error");
         return -1;
     }
-    BanknoteReader::initialized(taskName);
+
+    _serial->setTimeout(ULONG_MAX);
+    BanknoteReader::initialized();
     return 0;
 }
 
@@ -100,5 +103,6 @@ int OBH_K03S::activeStatusProcess(ActiveStatus reg) {
  OBH_K03S* OBH_K03S::getInstance(Stream &serial) {
     static OBH_K03S singleton_instance;
     singleton_instance._serial = &serial;
+    singleton_instance._name = "OBH_K03S";
     return &singleton_instance;
 }

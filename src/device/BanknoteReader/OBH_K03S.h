@@ -1,5 +1,4 @@
-#ifndef OBH_K03S_H
-#define OBH_K03S_H
+#pragma once
 
 #include <Arduino.h>
 #include "BanknoteReader.h"
@@ -38,9 +37,7 @@ private:
     OBH_K03S() {};
 public:
     static OBH_K03S* getInstance(Stream &serial);
-    virtual int initialized(const char* taskName);
+    virtual int initialized();
     virtual void enable();
     virtual void disable();
 };
-
-#endif

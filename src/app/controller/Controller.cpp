@@ -1,6 +1,12 @@
 #include <Controller.h>
 #include <SoftwareSerial.h>
 
+#include <device/BanknoteReader/OBH_K03S.h>
+#include <device/BanknoteReader/OBH_K03P.h>
+
+#include <device/Relay/UPUS_SKB.h>
+#include <device/Relay/R4D3B16.h>
+
 typedef enum {
     MessageKeypadPress,
     MessageKeypadRelease,
@@ -41,9 +47,9 @@ int Controller::setupModel() {
                 for (int i = 0; i < numOfRelay; i++) {
                     int nc = _machine->_database->getNumberOfChannels(i);
                     if (channel < nc) {
-                        _relays[i].open(channel);
+                        _relays[i]->open(channel);
                         delay(1000);
-                        _relays[i].close(channel);
+                        _relays[i]->close(channel);
                         break;
                     }
                     channel -= nc;
@@ -59,9 +65,9 @@ int Controller::setupModel() {
                 for (int i = 0; i < numOfRelay; i++) {
                     int nc = _machine->_database->getNumberOfChannels(i);
                     if (channel < nc) {
-                        _relays[i].open(channel);
+                        _relays[i]->open(channel);
                         delay(1000);
-                        _relays[i].close(channel);
+                        _relays[i]->close(channel);
                         break;
                     }
                     channel -= nc;
@@ -83,9 +89,9 @@ int Controller::setupModel() {
                     for(int j = 0; j < nChannels.size(); j++) {
                         int nc = nChannels[j];
                         if( channel < nc) {
-                            _relays[j].open(channel);
+                            _relays[j]->open(channel);
                             delay(1000);
-                            _relays[j].close(channel);
+                            _relays[j]->close(channel);
                             break;
                         }
                         channel -= nc;
@@ -108,9 +114,9 @@ int Controller::setupModel() {
                     for(int j = 0; j < nChannels.size(); j++) {
                         int nc = nChannels[j];
                         if( channel < nc) {
-                            _relays[j].open(channel);
+                            _relays[j]->open(channel);
                             delay(1000);
-                            _relays[j].close(channel);
+                            _relays[j]->close(channel);
                             break;
                         }
                         channel -= nc;
@@ -152,22 +158,21 @@ int Controller::setupKeypad() {
 }
 
 
-enum {
-    BANK_NOTE_RX = 2,
-    BANK_NOTE_TX = 3,
-};
 int Controller::setupKBankNoteReader() {
-    static SoftwareSerial ssBankNote(BANK_NOTE_RX, BANK_NOTE_TX);
-    ssBankNote.setTimeout(ULONG_MAX);
-    ssBankNote.begin(9600);
-
     int readerMode = _machine->_database->getBanknoteReaderMode();
     if (readerMode == 1) {
+        enum { BANK_NOTE_RX = 2, BANK_NOTE_TX = 3,};
+        static SoftwareSerial ssBankNote(BANK_NOTE_RX, BANK_NOTE_TX);
+        ssBankNote.begin(9600);
         _bankNoteReader = OBH_K03S::getInstance(ssBankNote);
+    } else if(readerMode == 2) {
+        _bankNoteReader = OBH_K03P::getInstance(13, 11, 12);
     } else {
         Serial.println("Reader Mode setting error");
         return -1;
     }
+
+    // _bankNoteReader = OBH_K03P::getInstance(13, 11, 12);
 
     auto onRecognizedBankNote = [&](const int billData) {
         Message msg;
@@ -177,8 +182,7 @@ int Controller::setupKBankNoteReader() {
     };
 
     _bankNoteReader->registerBillDataCallBack(onRecognizedBankNote);
-    _bankNoteReader->initialized("OBH_K03S");
-    return 0;
+    return _bankNoteReader->initialized();
 }
 
 
@@ -203,7 +207,7 @@ int Controller::setupRelays() {
     Serial2.setTX(MAX485_DI);
     Serial2.begin(9600);
     for (int i = 0; i < nRelays; i++) { //i + 1 is relay address
-        _relays.push_back(Relay(i+1, Serial2, preTx, postTx));
+        _relays.push_back(new R4D3B16(i+1, Serial2, preTx, postTx));
     }
 
     return 0;

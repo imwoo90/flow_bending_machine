@@ -1,15 +1,9 @@
-#ifndef RELAY_H
-#define RELAY_H
+#pragma once
 
-#include <ModbusMaster.h>
+#include <Arduino.h>
 
 class Relay {
-private:
-    ModbusMaster node;
 public:
-    Relay(uint8_t id, Stream &serial, void(*preTx)(), void(*postTx)());
-    uint8_t open(uint16_t addr);
-    uint8_t close(uint16_t addr);
+    virtual uint8_t open(uint16_t addr) = 0;
+    virtual uint8_t close(uint16_t addr) = 0;
 };
-
-#endif

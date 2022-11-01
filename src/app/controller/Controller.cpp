@@ -35,16 +35,12 @@ int Controller::setupMachine() {
         }
     };
     auto timeoutCallback = [&](const int signal) {
-        Message msg;
-        msg.type = MessageTimeout;
-        msg.data = signal;
+        Message msg = {.type = MessageTimeout, .data = signal};
         xQueueSend(_q, &msg, 10);
     };
 
     _machine->initialize(onChangedCallback, timeoutCallback);
-    Message msg;
-    msg.type = MessageInitial;
-    msg.data = 0;
+    Message msg = {.type = MessageInitial, .data = 0};
     xQueueSend(_q, &msg, 0);
     return 0;
 }
@@ -56,9 +52,7 @@ enum {
 };
 int Controller::setupKeypad() {
     auto keypadCallback = [&](const char key) {
-        Message msg;
-        msg.type = MessageKeypadPress;
-        msg.data = key;
+        Message msg = {.type = MessageKeypadPress, .data = key};
         xQueueSend(_q, &msg, 10);
     };
     Wire.setClock(400000);
@@ -84,9 +78,7 @@ int Controller::setupBankNoteReader() {
     }
 
     auto onRecognizedBankNote = [&](const int billData) {
-        Message msg;
-        msg.type = MessageBanknoteRecognize;
-        msg.data = billData;
+        Message msg = {.type = MessageBanknoteRecognize, .data = billData};
         xQueueSend(_q, &msg, 10);
     };
 

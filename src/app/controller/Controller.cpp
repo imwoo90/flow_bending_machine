@@ -34,12 +34,12 @@ int Controller::setupMachine() {
             _bankNoteReader->disable();
         }
     };
-    auto timeoutCallback = [&](const int signal) {
+    auto onTimeoutCallback = [&](const int signal) {
         Message msg = {.type = MessageTimeout, .data = signal};
         xQueueSend(_q, &msg, 10);
     };
 
-    _machine->initialize(onChangedCallback, timeoutCallback);
+    _machine->initialize(onChangedCallback, onTimeoutCallback);
     Message msg = {.type = MessageInitial, .data = 0};
     xQueueSend(_q, &msg, 0);
     return 0;
@@ -51,7 +51,7 @@ enum {
     KEYPAD_I2C_SDA = 4,
 };
 int Controller::setupKeypad() {
-    auto keypadCallback = [&](const char key) {
+    auto onKeypadCallback = [&](const char key) {
         Message msg = {.type = MessageKeypadPress, .data = key};
         xQueueSend(_q, &msg, 10);
     };
@@ -59,7 +59,7 @@ int Controller::setupKeypad() {
     Wire.setSCL(KEYPAD_I2C_SCL);
     Wire.setSDA(KEYPAD_I2C_SDA);
     _keypad = Keypad_4x3::getInstance();
-    _keypad->subscribe(keypadCallback);
+    _keypad->subscribe(onKeypadCallback);
     return 0;
 }
 

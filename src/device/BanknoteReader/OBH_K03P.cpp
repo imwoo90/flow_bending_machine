@@ -1,10 +1,11 @@
 #include "OBH_K03P.h"
 
 static void cntPulse(OBH_K03P* p) {
-    if ( xTimerIsTimerActive(p->_timer) == pdTRUE )
+    // if ( xTimerIsTimerActive(p->_timer) == pdTRUE )
         xTimerStopFromISR(p->_timer, 0);
 
     p->_cntPulse += 1;
+    Serial.printf("asdfasdf %d", p->_cntPulse);
     //key timout start
     xTimerStartFromISR(p->_timer, 0);
 }
@@ -34,11 +35,10 @@ int OBH_K03P::getBillData() {
     return billData;
 }
 
-int OBH_K03P::initialized(const char* taskName) {
+int OBH_K03P::initialized() {
     pinMode(_inhibitPin, OUTPUT);
     pinMode(_vendPin, INPUT_PULLUP);
     pinMode(_errorPin, INPUT_PULLUP);
-    disable();
 
     _q = xQueueCreate(16, 0);
     _timer = xTimerCreate(

@@ -1,22 +1,22 @@
-#include "SelectTest.h"
+#include "WorkingTest.h"
 
 #include "MainManagement.h"
 #include "ColumnTestManul.h"
 #include "ColumnTestSection.h"
 #include "ColumnTestAll.h"
 
-void SelectTest::initialize() {
+void WorkingTest::initialize() {
     _data.clear();
-    _data["state"] = "SelectTest";
+    _data["state"] = "WorkingTest";
 }
 
-SelectTest* SelectTest::getInstance() {
-    static SelectTest singleton_instance;
+WorkingTest* WorkingTest::getInstance() {
+    static WorkingTest singleton_instance;
     singleton_instance.initialize();
     return &singleton_instance;
 }
 
-MachineState* SelectTest::pressKey(const char key) {
+MachineState* WorkingTest::pressKey(const char key) {
     const bool changePasword = true;
     MachineState* next = this;
     switch ( key ) {

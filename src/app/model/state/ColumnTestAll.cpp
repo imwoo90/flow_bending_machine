@@ -1,6 +1,6 @@
 #include "ColumnTestAll.h"
 
-#include "SelectTest.h"
+#include "WorkingTest.h"
 
 void ColumnTestAll::initialize() {
     // init data
@@ -27,7 +27,7 @@ MachineState* ColumnTestAll::pressKey(const char key) {
         }
         break;}
     case '*':
-        next = SelectTest::getInstance();
+        next = WorkingTest::getInstance();
         break;
     default: {//1~9
         std::string &param_1 = _data["param_1"];

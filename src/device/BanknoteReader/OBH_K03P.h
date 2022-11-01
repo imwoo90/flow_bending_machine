@@ -20,7 +20,7 @@ public:
     int _cntPulse;
 
     static OBH_K03P* getInstance(int inhibitPin, int vendPin, int errorPin);
-    virtual int initialized(const char* taskName);
+    virtual int initialized();
     virtual void enable();
     virtual void disable();
     virtual int getBillData();

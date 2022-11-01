@@ -11,8 +11,8 @@ private:
     FlowVendingMachine() {}
 public:
     MachineData* _database;
-
-    void begin(bool isNormal, std::function<void(std::unordered_map<std::string, std::string>)> onChangedCallback, std::function<void(const int)> timeoutCallback);
+    void initialize(std::function<void(std::unordered_map<std::string, std::string>)> onChangedCallback, std::function<void(const int)> timeoutCallback);
+    void begin(bool isNormal);
     static FlowVendingMachine* getInstance() {
         static FlowVendingMachine singleton_instance;
         return &singleton_instance;

@@ -8,6 +8,11 @@
 #include <string>
 #include <vector>
 
+typedef enum {
+    TimeoutEnterProductNumber,
+    TimeoutInputMoney,
+} KindOfTimeout;
+
 class MachineState {
 private:
     virtual void initialize() = 0;

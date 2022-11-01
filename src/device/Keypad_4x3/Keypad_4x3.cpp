@@ -52,6 +52,11 @@ Keypad_4x3::Keypad_4x3(char *userKeymap, byte *row, byte *col, byte numRows, byt
         pcf8574.pinMode(col[c], OUTPUT);
         pcf8574.digitalWrite(col[c], HIGH);
     }
+
+    //LED pin settings
+    pcf8574.pinMode(P7, OUTPUT);
+    onLED();
+
     pcf8574.begin();
     task_initialize();
 }
@@ -59,8 +64,10 @@ Keypad_4x3::Keypad_4x3(char *userKeymap, byte *row, byte *col, byte numRows, byt
 Keypad_4x3* Keypad_4x3::getInstance() {
     static const byte _ROWS = 4; //four rows
     static const byte _COLS = 3; //three columns
-    static byte _rowPins[_ROWS] = {P0, P1, P2, P3}; //connect to the row pinouts of the keypad
-    static byte _colPins[_COLS] = {P6, P5, P4}; //connect to the column pinouts of the keypad
+    // static byte _rowPins[_ROWS] = {P0, P1, P2, P3}; //connect to the row pinouts of the keypad
+    // static byte _colPins[_COLS] = {P6, P5, P4}; //connect to the column pinouts of the keypad
+    static byte _rowPins[_ROWS] = {P6, P5, P4, P3};
+    static byte _colPins[_COLS] = {P0, P1, P2};
     static char _keys[_ROWS][_COLS] = {
         {'1','2','3'},
         {'4','5','6'},
@@ -73,6 +80,14 @@ Keypad_4x3* Keypad_4x3::getInstance() {
         singleton_instance = new Keypad_4x3(makeKeymap(_keys), _rowPins, _colPins, _ROWS, _COLS);
     }
     return singleton_instance;
+}
+
+void Keypad_4x3::onLED() {
+    pcf8574.digitalWrite(P7, LOW);
+}
+
+void Keypad_4x3::offLED() {
+    pcf8574.digitalWrite(P7, HIGH);
 }
 
 void Keypad_4x3::subscribe(std::function<void(const char)> callback) {

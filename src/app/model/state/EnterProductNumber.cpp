@@ -4,7 +4,7 @@
 #include "InputMoney.h"
 
 static void keyTimeoutCallBack( TimerHandle_t xTimer ) {
-    MachineState::_timeoutCallback(0);
+    MachineState::_timeoutCallback(TimeoutEnterProductNumber);
 }
 
 EnterProductNumber::EnterProductNumber() {
@@ -59,8 +59,8 @@ MachineState* EnterProductNumber::pressKey(const char key) {
             n -= 1; //change goods number == column number
             if (_database->getQuantity(n) > 0) {
                 next =InputMoney::getInstance(n);
+                break;
             }
-            break;
         } else if ( n == _database->getPasswordOfSystemManagement() ){
             next = EnterPasswordOfSystemSetting::getInstance();
             break;

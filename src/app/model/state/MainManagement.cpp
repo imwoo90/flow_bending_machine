@@ -3,7 +3,7 @@
 #include "SystemSetting.h"
 #include "SalesInfo.h"
 #include "SetGoods.h"
-#include "SelectTest.h"
+#include "WorkingTest.h"
 
 void MainManagement::initialize() {
     // init data
@@ -30,7 +30,7 @@ MachineState* MainManagement::pressKey(const char key) {
         next = SetGoods::getInstance();
         break;
     case '3':
-        next = SelectTest::getInstance();
+        next = WorkingTest::getInstance();
         break;
     case '4':
         // Not implemented yet

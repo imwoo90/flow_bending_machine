@@ -1,4 +1,5 @@
 #include <Controller.h>
+
 #include <SoftwareSerial.h>
 
 #include <device/BanknoteReader/OBH_K03S.h>
@@ -8,6 +9,7 @@
 #include <device/Relay/R4D3B16.h>
 
 typedef enum {
+    MessageInitial,
     MessageKeypadPress,
     MessageKeypadRelease,
     MessageBanknoteRecognize,
@@ -22,109 +24,16 @@ struct Message {
 int Controller::setupModel() {
     _machine = FlowVendingMachine::getInstance();
     auto onChangedCallback = [&](std::unordered_map<std::string, std::string> data) {
-        Serial.printf("state: %s\n\r", data["state"].c_str());
-        std::string param = "param_0";
-        for(int i = 0; i < 9; i++) {
-            param[6] = '0' + i;
-            if (data.find(param) == data.end())
-                break;
-            Serial.printf("param_%d=%s, ", i, data[param].c_str());
+        _display->show(data);
+
+        Serial.printf("%s\r\n", data["state"].c_str());
+
+
+        if (data["cmd"] == "enable_bill") {
+            _bankNoteReader->enable();
+        } else if (data["cmd"] == "disable_bill") {
+            _bankNoteReader->disable();
         }
-        Serial.printf("\n\r");
-        Serial.printf("\n\r");
-
-        if (data["state"] == "Selling") {
-            if (_isInitOk) {
-                _bankNoteReader->disable();
-            }
-        } else if (data["state"] == "InputMoney") {
-            int column = std::stoi(data["param_2"]) - 1;
-            int price = _machine->_database->getPrice(column);
-            int inputMoney = std::stoi(data["param_0"]);
-            if (price <= inputMoney) {
-                int channel = _machine->_database->getChannel(column);
-                int numOfRelay = _machine->_database->getNumberOfRelays();
-                for (int i = 0; i < numOfRelay; i++) {
-                    int nc = _machine->_database->getNumberOfChannels(i);
-                    if (channel < nc) {
-                        _relays[i]->open(channel);
-                        delay(1000);
-                        _relays[i]->close(channel);
-                        break;
-                    }
-                    channel -= nc;
-                }
-            } else {
-                _bankNoteReader->enable();
-            }
-        } else if (data["state"] == "ColumnTestManul") {
-            if (data["param_0"] == "start") {
-                int column = std::stoi(data["param_1"]) - 1;
-                int channel = _machine->_database->getChannel(column);
-                int numOfRelay = _machine->_database->getNumberOfRelays();
-                for (int i = 0; i < numOfRelay; i++) {
-                    int nc = _machine->_database->getNumberOfChannels(i);
-                    if (channel < nc) {
-                        _relays[i]->open(channel);
-                        delay(1000);
-                        _relays[i]->close(channel);
-                        break;
-                    }
-                    channel -= nc;
-                }
-            }
-        } else if (data["state"] == "ColumnTestSection") {
-            if (data["param_0"] == "start") {
-                int column = std::stoi(data["param_1"]) - 1;
-                int nColumns = std::stoi(data["param_2"]) - 1;
-                int numOfRelay = _machine->_database->getNumberOfRelays();
-                std::vector<int> nChannels;
-                for(int i = 0; i < numOfRelay; i++) {
-                    int nc = _machine->_database->getNumberOfChannels(i);
-                    nChannels.push_back(nc);
-                }
-
-                for (int i = column; i <= nColumns; i++) {
-                    int channel = _machine->_database->getChannel(i);
-                    for(int j = 0; j < nChannels.size(); j++) {
-                        int nc = nChannels[j];
-                        if( channel < nc) {
-                            _relays[j]->open(channel);
-                            delay(1000);
-                            _relays[j]->close(channel);
-                            break;
-                        }
-                        channel -= nc;
-                    }
-                }
-            }
-        } else if (data["state"] == "ColumnTestAll") {
-            if (data["param_0"] == "start") {
-                int column = std::stoi(data["param_1"]) - 1;
-                int nColumns =  _machine->_database->getNumberOfColumns();
-                int numOfRelay = _machine->_database->getNumberOfRelays();
-                std::vector<int> nChannels;
-                for(int i = 0; i < numOfRelay; i++) {
-                    int nc = _machine->_database->getNumberOfChannels(i);
-                    nChannels.push_back(nc);
-                }
-
-                for (int i = column; i < nColumns; i++) {
-                    int channel = _machine->_database->getChannel(i);
-                    for(int j = 0; j < nChannels.size(); j++) {
-                        int nc = nChannels[j];
-                        if( channel < nc) {
-                            _relays[j]->open(channel);
-                            delay(1000);
-                            _relays[j]->close(channel);
-                            break;
-                        }
-                        channel -= nc;
-                    }
-                }
-            }
-        }
-
     };
     auto timeoutCallback = [&](const int signal) {
         Message msg;
@@ -132,15 +41,19 @@ int Controller::setupModel() {
         msg.data = signal;
         xQueueSend(_q, &msg, 10);
     };
-    _machine->begin(1, onChangedCallback, timeoutCallback);
 
+    _machine->initialize(onChangedCallback, timeoutCallback);
+    Message msg;
+    msg.type = MessageInitial;
+    msg.data = 0;
+    xQueueSend(_q, &msg, 0);
     return 0;
 }
 
 
 enum {
-    KEYPAD_I2C_SCL = 17,
-    KEYPAD_I2C_SDA = 16,
+    KEYPAD_I2C_SCL = 5,
+    KEYPAD_I2C_SDA = 4,
 };
 int Controller::setupKeypad() {
     auto keypadCallback = [&](const char key) {
@@ -158,21 +71,18 @@ int Controller::setupKeypad() {
 }
 
 
-int Controller::setupKBankNoteReader() {
+int Controller::setupBankNoteReader() {
     int readerMode = _machine->_database->getBanknoteReaderMode();
     if (readerMode == 1) {
-        enum { BANK_NOTE_RX = 2, BANK_NOTE_TX = 3,};
-        static SoftwareSerial ssBankNote(BANK_NOTE_RX, BANK_NOTE_TX);
-        ssBankNote.begin(9600);
-        _bankNoteReader = OBH_K03S::getInstance(ssBankNote);
+        Serial2.setPinout(8, 9);
+        Serial2.begin(9600);
+        _bankNoteReader = OBH_K03S::getInstance(Serial2);
     } else if(readerMode == 2) {
-        _bankNoteReader = OBH_K03P::getInstance(13, 11, 12);
+        _bankNoteReader = OBH_K03P::getInstance(12, 10, 11);
     } else {
         Serial.println("Reader Mode setting error");
         return -1;
     }
-
-    // _bankNoteReader = OBH_K03P::getInstance(13, 11, 12);
 
     auto onRecognizedBankNote = [&](const int billData) {
         Message msg;
@@ -187,49 +97,60 @@ int Controller::setupKBankNoteReader() {
 
 
 enum {
-    MAX485_DE_RE = 6,
-    MAX485_RO = 5,
-    MAX485_DI = 4,
+    MAX485_RO = 1,
+    MAX485_DI = 0,
 };
-static void preTx() {
-    digitalWrite(MAX485_DE_RE, 1);
-}
-static void postTx() {
-    digitalWrite(MAX485_DE_RE, 0);
-}
 int Controller::setupRelays() {
     int nRelays = _machine->_database->getNumberOfRelays();
     _relays.clear();
 
-    pinMode(MAX485_DE_RE, OUTPUT);
-    digitalWrite(MAX485_DE_RE, 0);
-    Serial2.setRX(MAX485_RO);
-    Serial2.setTX(MAX485_DI);
-    Serial2.begin(9600);
-    for (int i = 0; i < nRelays; i++) { //i + 1 is relay address
-        _relays.push_back(new R4D3B16(i+1, Serial2, preTx, postTx));
-    }
+    Serial1.setRX(MAX485_RO);
+    Serial1.setTX(MAX485_DI);
+    Serial1.begin(9600);
+    // for (int i = 0; i < nRelays; i++) { //i + 1 is relay address
+    //     _relays.push_back(new R4D3B16(i+1, Serial1, preTx, postTx));
+    // }
 
+    // R4D3B16 test(1, Serial1);
+    // for(int i = 0; i < 10; i++) {
+    //     test.open(0x05);
+    //     delay(1000);
+    //     test.close(0x05);
+    //     delay(1000);
+    //     Serial.println("relay test");
+    // }
     return 0;
 }
 
 void Controller::setup() {
+    _display = Display::getInstance();
+    _display->begin();
     delay(5000);
     // Controller loop Queue Create
     _q = xQueueCreate(16, sizeof(Message));
-    setupModel();
+    if (setupModel() < 0) {
+        return;
+    }
 
     // Setup device
-    setupKBankNoteReader();
-    setupKeypad();
-    setupRelays();
-    _isInitOk = true;
+    if (setupBankNoteReader() < 0) {
+
+    }
+    if (setupKeypad() < 0) {
+
+    }
+    if (setupRelays() < 0) {
+
+    }
 }
 
 void Controller::loop() {
     Message msg;
     xQueueReceive(_q, &msg, portMAX_DELAY);
     switch(msg.type) {
+    case MessageInitial:
+        _machine->begin(1);
+        break;
     case MessageKeypadPress:
         _machine->pressKey(msg.data);
         break;

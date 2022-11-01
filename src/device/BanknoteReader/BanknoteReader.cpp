@@ -23,6 +23,7 @@ int BanknoteReader::initialized() {
         Priority = configMAX_PRIORITIES / 2 - 1,
     };
 
+    disable();
     xTaskCreate(banknoteEventTask, _name.c_str(), 512, this, Priority, &_eventTask);
     return 0;
 }

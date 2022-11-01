@@ -4,7 +4,7 @@
 
 
 static void inputMoneyTimeoutCallBack( TimerHandle_t xTimer ) {
-    MachineState::_timeoutCallback(1);
+    MachineState::_timeoutCallback(TimeoutInputMoney);
 }
 
 InputMoney::InputMoney() {
@@ -33,11 +33,8 @@ void InputMoney::initialize() {
 
     // init data
     _data.clear();
-    _data["state"] = "InputMoney";
-    _data["param_0"] = "0";
-    _data["param_1"] = itoa(_database->getPrice(_column), buf, 10);
-    _data["param_2"] = itoa(_column+1, buf, 10);
-
+    _data["state"] = "InputMoney_0";
+    _data["cmd"] = "enable_bill";
     xTimerChangePeriod(_timer, 30*1000, 0);
     //key timout start
     xTimerStart(_timer, 0);
@@ -46,6 +43,7 @@ void InputMoney::initialize() {
 InputMoney* InputMoney::getInstance(int column) {
     static InputMoney singleton_instance;
     singleton_instance._column = column;
+    singleton_instance._inputMoney = 0;
     singleton_instance.initialize();
     return &singleton_instance;
 }
@@ -58,14 +56,17 @@ MachineState* InputMoney::recognizeBanknote(const int banknote) {
     xTimerStop(_timer, 0);
 
     int price = _database->getPrice(_column);
-    int inputMoney = std::stoi(_data["param_0"]) + banknote;
-    _data["param_0"] = itoa(inputMoney, buf, 10);
-    if (price <= inputMoney) {
+   _inputMoney += banknote;
+
+   _data["state"] = "InputMoney_1";
+    _data["param_0"] = itoa(_inputMoney, buf, 10);
+    _data["param_1"] = itoa(price, buf, 10);
+    if (price <= _inputMoney) {
         int quantity = _database->getQuantity(_column);
         _database->setQuantity(_column, quantity-1);
         _database->setNumberOfTotalSales(1 + _database->getNumberOfTotalSales());
         _database->setMoneyOfTotalSales(price + _database->getMoneyOfTotalSales());
-
+        _data["cmd"] = "disable_bill";
         xTimerChangePeriod(_timer, 3*1000, 0);
     }
 
@@ -80,7 +81,6 @@ MachineState* InputMoney::pressKey(const char key) {
         if ( xTimerIsTimerActive(_timer) == pdFALSE )
             return this;
         xTimerStop(_timer, 0);
-
         next = Selling::getInstance();
         break;
     }

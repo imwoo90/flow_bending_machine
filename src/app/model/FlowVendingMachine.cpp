@@ -2,17 +2,20 @@
 #include "state/Selling.h"
 #include "state/StopSelling.h"
 
-void FlowVendingMachine::begin(bool isNormal, std::function<void(std::unordered_map<std::string, std::string>)> onChangedCallback, std::function<void(const int)> timeoutCallback) {
+void FlowVendingMachine::initialize(std::function<void(std::unordered_map<std::string, std::string>)> onChangedCallback, std::function<void(const int)> timeoutCallback) {
     MachineState::_onChangedCallback = onChangedCallback;
     MachineState::_timeoutCallback = timeoutCallback;
+    _database = MachineData::getInstance();
+    _database->initialize();
+    MachineState::_database = _database;
+}
+
+void FlowVendingMachine::begin(bool isNormal) {
     if (isNormal) {
         _state = Selling::getInstance();
     } else {
         _state = StopSelling::getInstance();
     }
-    _database = MachineData::getInstance();
-    _database->initialize();
-    _state->_database = _database;
     MachineState::_onChangedCallback(_state->_data);
 }
 

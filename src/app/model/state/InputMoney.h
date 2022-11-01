@@ -8,6 +8,7 @@
 
 class InputMoney : public MachineState {
 private:
+    int _inputMoney;
     int _column;
     TimerHandle_t _timer;
     InputMoney();

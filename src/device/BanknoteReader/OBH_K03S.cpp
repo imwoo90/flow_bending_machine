@@ -21,7 +21,7 @@ int OBH_K03S::initialized() {
     char cmd[3] = {'R', 'S', 'T'};
     sendCommand(cmd);
     _serial->readBytes(_buf, 5);
-    if (receiveCommnad(_buf, "NG")) {
+    if (!receiveCommnad(_buf, "OK")) {
         Serial.println("OHB_K03S reset error");
         return -1;
     }
@@ -32,7 +32,7 @@ int OBH_K03S::initialized() {
     cmd[0] = 'S'; cmd[1] = 'C'; cmd[2] = 0x37;
     sendCommand(cmd);
     _serial->readBytes(_buf, 5);
-    if (receiveCommnad(_buf, "NG")) {
+    if (!receiveCommnad(_buf, "OK")) {
         Serial.println("OHB_K03S config error");
         return -1;
     }

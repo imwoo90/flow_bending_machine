@@ -24,10 +24,9 @@ struct Message {
 int Controller::setupModel() {
     _machine = FlowVendingMachine::getInstance();
     auto onChangedCallback = [&](std::unordered_map<std::string, std::string> data) {
-        _display->show(data);
-
         Serial.printf("%s\r\n", data["state"].c_str());
 
+        _display->show(data);
 
         if (data["cmd"] == "enable_bill") {
             _bankNoteReader->enable();
@@ -142,6 +141,7 @@ void Controller::setup() {
     if (setupRelays() < 0) {
 
     }
+    //todo 디바이스 초기화 제대로 안되었을때 상태 만들어야함
 }
 
 void Controller::loop() {

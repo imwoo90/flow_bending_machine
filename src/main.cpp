@@ -1,13 +1,13 @@
 #include <Controller.h>
 
-Controller* ctr;
+Controller* ctrl;
 void setup()
 {
-  ctr = Controller::getInstance();
-  ctr->setup();
+  ctrl = Controller::getInstance();
+  ctrl->setup();
 }
 
 void loop()
 {
-  ctr->loop();
+  ctrl->loop();
 }

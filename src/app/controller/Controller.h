@@ -25,7 +25,7 @@ private:
     int setupKeypad();
     int setupBankNoteReader();
     int setupRelays();
-    int setupModel();
+    int setupMachine();
 
     Controller() {}
 public:

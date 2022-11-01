@@ -21,7 +21,7 @@ struct Message {
     int data;
 };
 
-int Controller::setupModel() {
+int Controller::setupMachine() {
     _machine = FlowVendingMachine::getInstance();
     auto onChangedCallback = [&](std::unordered_map<std::string, std::string> data) {
         Serial.printf("%s\r\n", data["state"].c_str());
@@ -127,7 +127,7 @@ void Controller::setup() {
     delay(5000);
     // Controller loop Queue Create
     _q = xQueueCreate(16, sizeof(Message));
-    if (setupModel() < 0) {
+    if (setupMachine() < 0) {
         return;
     }
 

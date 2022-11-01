@@ -1,10 +1,7 @@
 #include <Controller.h>
 
-#include <SoftwareSerial.h>
-
 #include <device/BanknoteReader/OBH_K03S.h>
 #include <device/BanknoteReader/OBH_K03P.h>
-
 #include <device/Relay/UPUS_SKB.h>
 #include <device/Relay/R4D3B16.h>
 

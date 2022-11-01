@@ -1,5 +1,5 @@
-#ifndef CONTROLLER_H
-#define CONTROLLER_H
+#pragma ocee
+
 #include <FreeRTOS.h>
 #include <queue.h>
 
@@ -36,5 +36,3 @@ public:
     void setup();
     void loop();
 };
-
-#endif

@@ -24,9 +24,9 @@ static void notify() {
     if (key == (char)-1)
         return;
 
-    if (key == 27)
+    if (key == 27) // esc
         key = '*';
-    else if (key == 9)
+    else if (key == 9) // tab
         key = '#';
 
     for (auto i = 0; i < _callbacks.size(); i++) {

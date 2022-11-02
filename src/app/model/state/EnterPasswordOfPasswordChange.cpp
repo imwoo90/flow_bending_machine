@@ -6,10 +6,10 @@ bool EnterPasswordOfPasswordChange::isMatched(int password) {
     return _database->getPasswordOfPasswordChange() == password;
 }
 
-MachineState* EnterPasswordOfPasswordChange::decide() {
+MachineState* EnterPasswordOfPasswordChange::decide(int password) {
     if (_isChangePasswords) {
-        int password = std::stoi(_data["param_0"]);
         _database->setPasswordOfPasswordChange(password);
+        return this;
     }
     return PasswordChange::getInstance();
 }
@@ -25,7 +25,12 @@ void EnterPasswordOfPasswordChange::initialize() {
     // init data
     _data.clear();
     _data["state"] = "EnterPasswordOfPasswordChange";
-    _data["param_0"] = "000000";
+    if (_isChangePasswords) {
+        char buf[32];
+        _data["param_0"] = itoa(_database->getPasswordOfPasswordChange(), buf, 10);
+    } else {
+        _data["param_0"] = "000000";
+    }
 }
 
 EnterPasswordOfPasswordChange* EnterPasswordOfPasswordChange::getInstance(bool changePassword) {

@@ -7,9 +7,8 @@ bool EnterPasswordOfSystemSetting::isMatched(int password) {
     return _database->getPasswordOfSystemSetting() == password;
 }
 
-MachineState* EnterPasswordOfSystemSetting::decide() {
+MachineState* EnterPasswordOfSystemSetting::decide(int password) {
     if (_isChangePasswords) {
-        int password = std::stoi(_data["param_0"]);
         _database->setPasswordOfSystemSetting(password);
         return this;
     }
@@ -27,7 +26,12 @@ void EnterPasswordOfSystemSetting::initialize() {
     // init data
     _data.clear();
     _data["state"] = "EnterPasswordOfSystemSetting";
-    _data["param_0"] = "0000";
+    if (_isChangePasswords) {
+        char buf[32];
+        _data["param_0"] = itoa(_database->getPasswordOfSystemSetting(), buf, 10);
+    } else {
+        _data["param_0"] = "0000";
+    }
 }
 
 EnterPasswordOfSystemSetting* EnterPasswordOfSystemSetting::getInstance(bool changePassword) {

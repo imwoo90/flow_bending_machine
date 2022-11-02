@@ -7,9 +7,8 @@ bool EnterPasswordOfMainManagement::isMatched(int password) {
     return _database->getPasswordOfMainManagement() == password;
 }
 
-MachineState* EnterPasswordOfMainManagement::decide() {
+MachineState* EnterPasswordOfMainManagement::decide(int password) {
     if (_isChangePasswords) {
-        int password = std::stoi(_data["param_0"]);
         _database->setPasswordOfMainManagement(password);
         return this;
     }
@@ -27,7 +26,12 @@ void EnterPasswordOfMainManagement::initialize() {
     // init data
     _data.clear();
     _data["state"] = "EnterPasswordOfMainManagement";
-    _data["param_0"] = "000000";
+    if (_isChangePasswords) {
+        char buf[32];
+        _data["param_0"] = itoa(_database->getPasswordOfMainManagement(), buf, 10);
+    } else {
+        _data["param_0"] = "000000";
+    }
 }
 
 EnterPasswordOfMainManagement* EnterPasswordOfMainManagement::getInstance(bool changePassword) {

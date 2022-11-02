@@ -10,8 +10,8 @@ MachineState* EnterPassword::pressKey(const char key) {
     case '#':{
         std::string &param_0 = _data["param_0"];
         int pw = std::stoi(param_0);
-        if ( isMatched(pw) ) {
-            next = decide();
+        if (_isChangePasswords || isMatched(pw)) {
+            next = decide(pw);
         }
         break;}
     case '*':{

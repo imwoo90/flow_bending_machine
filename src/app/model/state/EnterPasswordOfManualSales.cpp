@@ -7,9 +7,8 @@ bool EnterPasswordOfManualSales::isMatched(int password) {
     return _database->getPasswordOfManualSales() == password;
 }
 
-MachineState* EnterPasswordOfManualSales::decide() {
+MachineState* EnterPasswordOfManualSales::decide(int password) {
     if (_isChangePasswords) {
-        int password = std::stoi(_data["param_0"]);
         _database->setPasswordOfManualSales(password);
         return this;
     }
@@ -27,7 +26,12 @@ void EnterPasswordOfManualSales::initialize() {
     // init data
     _data.clear();
     _data["state"] = "EnterPasswordOfManualSales";
-    _data["param_0"] = "000000";
+    if (_isChangePasswords) {
+        char buf[32];
+        _data["param_0"] = itoa(_database->getPasswordOfManualSales(), buf, 10);
+    } else {
+        _data["param_0"] = "000000";
+    }
 }
 
 EnterPasswordOfManualSales* EnterPasswordOfManualSales::getInstance(bool changePassword) {

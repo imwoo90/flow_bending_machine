@@ -18,10 +18,16 @@ int  Keypad_4x3::pin_read(byte pinNum) {
 }
 
 static void notify() {
-    Keypad_4x3* kp = Keypad_4x3::getInstance();
-    char key = kp->getKey();
-    if (key == NO_KEY)
+    // Keypad_4x3* kp = Keypad_4x3::getInstance();
+    // char key = kp->getKey();
+    char key = Serial.read();
+    if (key == (char)-1)
         return;
+
+    if (key == 27)
+        key = '*';
+    else if (key == 9)
+        key = '#';
 
     for (auto i = 0; i < _callbacks.size(); i++) {
         _callbacks[i](key);

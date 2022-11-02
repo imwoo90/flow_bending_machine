@@ -1,17 +1,17 @@
 #include "EnterPasswordOfAdditionalStock.h"
 #include "SystemSetting.h"
+#include "AdditionalStock.h"
 
 bool EnterPasswordOfAdditionalStock::isMatched(int password) {
     return _database->getPasswordOfAdditionalStock() == password;
 }
 
-MachineState* EnterPasswordOfAdditionalStock::decide() {
+MachineState* EnterPasswordOfAdditionalStock::decide(int password) {
     if (_isChangePasswords) {
-        int password = std::stoi(_data["param_0"]);
         _database->setPasswordOfAdditionalStock(password);
         return this;
     }
-    return this;
+    return AdditionalStock::getInstance();
 }
 
 MachineState* EnterPasswordOfAdditionalStock::cancel() {
@@ -25,7 +25,12 @@ void EnterPasswordOfAdditionalStock::initialize() {
     // init data
     _data.clear();
     _data["state"] = "EnterPasswordOfAdditionalStock";
-    _data["param_0"] = "000000";
+    if (_isChangePasswords) {
+        char buf[32];
+        _data["param_0"] = itoa(_database->getPasswordOfAdditionalStock(), buf, 10);
+    } else {
+        _data["param_0"] = "000000";
+    }
 }
 
 EnterPasswordOfAdditionalStock* EnterPasswordOfAdditionalStock::getInstance(bool changePassword) {

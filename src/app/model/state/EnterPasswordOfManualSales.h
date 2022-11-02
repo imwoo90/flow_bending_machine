@@ -6,7 +6,7 @@ class EnterPasswordOfManualSales : public EnterPassword {
 private:
     EnterPasswordOfManualSales() {}
     virtual bool isMatched(int password);
-    virtual MachineState* decide();
+    virtual MachineState* decide(int password);
     virtual MachineState* cancel();
     virtual void initialize();
 public:

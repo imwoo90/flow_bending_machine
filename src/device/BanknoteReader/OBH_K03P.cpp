@@ -1,11 +1,10 @@
 #include "OBH_K03P.h"
 
-static void cntPulse(OBH_K03P* p) {
-    // if ( xTimerIsTimerActive(p->_timer) == pdTRUE )
-        xTimerStopFromISR(p->_timer, 0);
+static void cntPulse() {
+    OBH_K03P* p = OBH_K03P::getInstance();
+    xTimerStopFromISR(p->_timer, 0);
 
     p->_cntPulse += 1;
-    Serial.printf("asdfasdf %d", p->_cntPulse);
     //key timout start
     xTimerStartFromISR(p->_timer, 0);
 }
@@ -15,8 +14,8 @@ static void billDataEndCallback( TimerHandle_t xTimer ) {
     xQueueSend(p->_q, NULL, 0);
 }
 
-static void errorOccur(OBH_K03P* p) {
-
+static void errorOccur() {
+     OBH_K03P* p = OBH_K03P::getInstance();
 }
 
 void OBH_K03P::enable() {
@@ -59,17 +58,21 @@ int OBH_K03P::initialized() {
         it expires. */
         billDataEndCallback
     );
-    attachInterrupt(_vendPin, cntPulse, FALLING, this);
-    attachInterrupt(_errorPin, errorOccur, FALLING, this);
+    attachInterrupt(_vendPin, cntPulse, FALLING);
+    attachInterrupt(_errorPin, errorOccur, FALLING);
     BanknoteReader::initialized();
     return 0;
 }
 
-OBH_K03P* OBH_K03P::getInstance(int inhibitPin, int vendPin, int errorPin) {
+OBH_K03P* OBH_K03P::setPins(int inhibitPin, int vendPin, int errorPin) {
+    _inhibitPin = inhibitPin;
+    _vendPin = vendPin;
+    _errorPin = errorPin;
+    _name = "OBH_K03P";
+    return this;
+}
+
+OBH_K03P* OBH_K03P::getInstance() {
     static OBH_K03P singleton_instance;
-    singleton_instance._inhibitPin = inhibitPin;
-    singleton_instance._vendPin = vendPin;
-    singleton_instance._errorPin = errorPin;
-    singleton_instance._name = "OBH_K03P";
     return &singleton_instance;
 }

@@ -1,8 +1,8 @@
-#include <FreeRTOS.h>
-#include <task.h>
-
 #include "Keypad_4x3.h"
 #include <vector>
+
+#include <FreeRTOS.h>
+#include <task.h>
 
 static std::vector<std::function<void(const char)> > _callbacks;
 

@@ -68,7 +68,7 @@ int Controller::setupBankNoteReader() {
         Serial2.begin(9600);
         _bankNoteReader = OBH_K03S::getInstance(Serial2);
     } else if(readerMode == 2) {
-        _bankNoteReader = OBH_K03P::getInstance(12, 10, 11);
+        _bankNoteReader = OBH_K03P::getInstance()->setPins(12, 10, 11);
     } else {
         Serial.println("Reader Mode setting error");
         return -1;
@@ -127,9 +127,9 @@ void Controller::setup() {
     if (setupKeypad() < 0) {
 
     }
-    if (setupRelays() < 0) {
+    // if (setupRelays() < 0) {
 
-    }
+    // }
     //todo 디바이스 초기화 제대로 안되었을때 상태 만들어야함
 }
 

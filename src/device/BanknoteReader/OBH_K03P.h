@@ -1,11 +1,11 @@
 #pragma once
 
+#include <Arduino.h>
+#include "BanknoteReader.h"
+
 #include <FreeRTOS.h>
 #include <queue.h>
 #include <timers.h>
-
-#include <Arduino.h>
-#include "BanknoteReader.h"
 
 class OBH_K03P : public BanknoteReader {
 private:
@@ -19,7 +19,8 @@ public:
     TimerHandle_t _timer;
     int _cntPulse;
 
-    static OBH_K03P* getInstance(int inhibitPin, int vendPin, int errorPin);
+    OBH_K03P* setPins(int inhibitPin, int vendPin, int errorPin);
+    static OBH_K03P* getInstance();
     virtual int initialized();
     virtual void enable();
     virtual void disable();

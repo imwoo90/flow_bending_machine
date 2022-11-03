@@ -1,14 +1,14 @@
 #pragma ocee
 
-#include <FreeRTOS.h>
-#include <queue.h>
-
 #include <Arduino.h>
 #include <FlowVendingMachine.h>
 #include <device/Keypad_4x3/Keypad_4x3.h>
 #include <device/BanknoteReader/BanknoteReader.h>
 #include <device/Relay/Relay.h>
 #include <Display.h>
+
+#include <FreeRTOS.h>
+#include <queue.h>
 
 class Controller {
 private:

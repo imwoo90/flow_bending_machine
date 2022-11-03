@@ -1,10 +1,10 @@
 #pragma once
 
-#include <FreeRTOS.h>
-#include <timers.h>
-
 #include <MachineState.h>
 #include <MachineData.h>
+
+#include <FreeRTOS.h>
+#include <timers.h>
 
 class EnterProductNumber : public MachineState {
 private:

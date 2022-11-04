@@ -127,9 +127,9 @@ void Controller::setup() {
     if (setupKeypad() < 0) {
 
     }
-    // if (setupRelays() < 0) {
+    if (setupRelays() < 0) {
 
-    // }
+    }
     //todo 디바이스 초기화 제대로 안되었을때 상태 만들어야함
 }
 

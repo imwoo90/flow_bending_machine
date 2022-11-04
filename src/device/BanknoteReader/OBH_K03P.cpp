@@ -1,21 +1,29 @@
 #include "OBH_K03P.h"
 
-static void cntPulse() {
-    OBH_K03P* p = OBH_K03P::getInstance();
+static void cntPulse(OBH_K03P* p) {
     xTimerStopFromISR(p->_timer, 0);
 
     p->_cntPulse += 1;
-    //key timout start
     xTimerStartFromISR(p->_timer, 0);
 }
-
 static void billDataEndCallback( TimerHandle_t xTimer ) {
     OBH_K03P* p = (OBH_K03P*)pvTimerGetTimerID(xTimer);
-    xQueueSend(p->_q, NULL, 0);
+    switch(p->_cntPulse) {
+    case 1:
+    case 5:
+    case 10:
+        xQueueSend(p->_q, NULL, 0);
+        break;
+    default:
+        Serial.println("Banknote Reader recognize error");
+    }
+
+    Serial.printf("Banknote count pulse %d\r\n", p->_cntPulse);
+    p->_cntPulse = 0;
 }
 
-static void errorOccur() {
-     OBH_K03P* p = OBH_K03P::getInstance();
+static void errorOccur(OBH_K03P* p) {
+
 }
 
 void OBH_K03P::enable() {
@@ -58,8 +66,8 @@ int OBH_K03P::initialized() {
         it expires. */
         billDataEndCallback
     );
-    attachInterrupt(_vendPin, cntPulse, FALLING);
-    attachInterrupt(_errorPin, errorOccur, FALLING);
+    attachInterrupt(_vendPin, cntPulse, FALLING, this);
+    attachInterrupt(_errorPin, errorOccur, FALLING, this);
     BanknoteReader::initialized();
     return 0;
 }

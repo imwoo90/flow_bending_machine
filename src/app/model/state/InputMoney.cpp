@@ -34,7 +34,7 @@ void InputMoney::initialize() {
     // init data
     _data.clear();
     _data["state"] = "InputMoney_0";
-    _data["cmd"] = "enable_bill";
+    _data["BanknoteReader"] = "enable";
     xTimerChangePeriod(_timer, 30*1000, 0);
     //key timout start
     xTimerStart(_timer, 0);
@@ -66,7 +66,11 @@ MachineState* InputMoney::recognizeBanknote(const int banknote) {
         _database->setQuantity(_column, quantity-1);
         _database->setNumberOfTotalSales(1 + _database->getNumberOfTotalSales());
         _database->setMoneyOfTotalSales(price + _database->getMoneyOfTotalSales());
-        _data["cmd"] = "disable_bill";
+        _data["BanknoteReader"] = "disable";
+
+        // To do this
+        _data["LockerType"] = "";
+        _data["Channel"] = "";
         xTimerChangePeriod(_timer, 3*1000, 0);
     }
 

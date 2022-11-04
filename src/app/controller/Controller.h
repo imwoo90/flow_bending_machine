@@ -12,7 +12,7 @@
 
 class Controller {
 private:
-    int _isInitOk = false;
+    int _isInitOk = true;
     QueueHandle_t _q;
 
     Display* _display;

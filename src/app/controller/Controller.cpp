@@ -25,11 +25,14 @@ int Controller::setupMachine() {
 
         _display->show(data);
 
-        if (data["cmd"] == "enable_bill") {
+        //Reader enable disable controll
+        if (data["BanknoteReader"] == "enable") {
             _bankNoteReader->enable();
-        } else if (data["cmd"] == "disable_bill") {
+        } else if (data["BanknoteReader"] == "disable") {
             _bankNoteReader->disable();
         }
+
+        //relay controll
     };
     auto onTimeoutCallback = [&](const int signal) {
         Message msg = {.type = MessageTimeout, .data = signal};
@@ -42,12 +45,8 @@ int Controller::setupMachine() {
     return 0;
 }
 
-
-enum {
-    KEYPAD_I2C_SCL = 5,
-    KEYPAD_I2C_SDA = 4,
-};
 int Controller::setupKeypad() {
+    enum {KEYPAD_I2C_SCL = 5, KEYPAD_I2C_SDA = 4,};
     auto onKeypadCallback = [&](const char key) {
         Message msg = {.type = MessageKeypadPress, .data = key};
         xQueueSend(_q, &msg, 10);
@@ -59,7 +58,6 @@ int Controller::setupKeypad() {
     _keypad->subscribe(onKeypadCallback);
     return 0;
 }
-
 
 int Controller::setupBankNoteReader() {
     int readerMode = _machine->_database->getBanknoteReaderMode();
@@ -83,18 +81,17 @@ int Controller::setupBankNoteReader() {
     return _bankNoteReader->initialized();
 }
 
-
-enum {
-    MAX485_RO = 1,
-    MAX485_DI = 0,
-};
 int Controller::setupRelays() {
+    enum {MAX485_RO = 1, MAX485_DI = 0,};
     int nRelays = _machine->_database->getNumberOfRelays();
     _relays.clear();
 
     Serial1.setRX(MAX485_RO);
     Serial1.setTX(MAX485_DI);
     Serial1.begin(9600);
+
+    // To do relay initialize
+
     // for (int i = 0; i < nRelays; i++) { //i + 1 is relay address
     //     _relays.push_back(new R4D3B16(i+1, Serial1, preTx, postTx));
     // }
@@ -113,24 +110,28 @@ int Controller::setupRelays() {
 void Controller::setup() {
     _display = Display::getInstance();
     _display->begin();
-    delay(5000);
+    delay(1000);
     // Controller loop Queue Create
     _q = xQueueCreate(16, sizeof(Message));
     if (setupMachine() < 0) {
         return;
     }
-
+    delay(1000);
     // Setup device
     if (setupBankNoteReader() < 0) {
-
+        _isInitOk = false;
     }
+    delay(1000);
     if (setupKeypad() < 0) {
-
+        _isInitOk = false;
     }
+    delay(1000);
     if (setupRelays() < 0) {
-
+        _isInitOk = false;
     }
-    //todo 디바이스 초기화 제대로 안되었을때 상태 만들어야함
+    delay(1000);
+
+    //total setup time is 5sec for easy firmware update when running binary is dead right now after started
 }
 
 void Controller::loop() {
@@ -138,7 +139,7 @@ void Controller::loop() {
     xQueueReceive(_q, &msg, portMAX_DELAY);
     switch(msg.type) {
     case MessageInitial:
-        _machine->begin(1);
+        _machine->begin(_isInitOk);
         break;
     case MessageKeypadPress:
         _machine->pressKey(msg.data);

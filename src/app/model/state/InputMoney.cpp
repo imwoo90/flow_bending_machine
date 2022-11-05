@@ -58,19 +58,22 @@ MachineState* InputMoney::recognizeBanknote(const int banknote) {
     int price = _database->getPrice(_column);
    _inputMoney += banknote;
 
-   _data["state"] = "InputMoney_1";
+    _data["state"] = "InputMoney_1";
     _data["param_0"] = itoa(_inputMoney, buf, 10);
     _data["param_1"] = itoa(price, buf, 10);
     if (price <= _inputMoney) {
-        int quantity = _database->getQuantity(_column);
-        _database->setQuantity(_column, quantity-1);
+        int quantity = _database->getQuantity(_column) - 1;
+        _database->setQuantity(_column, quantity);
         _database->setNumberOfTotalSales(1 + _database->getNumberOfTotalSales());
         _database->setMoneyOfTotalSales(price + _database->getMoneyOfTotalSales());
         _data["BanknoteReader"] = "disable";
 
+        _data["LockerType"] = itoa(_database->getMotorType(_column), buf, 10);
+        _data["LockerChannel"] = itoa(_database->getChannel(_column), buf, 10);
         // To do this
-        _data["LockerType"] = "";
-        _data["Channel"] = "";
+        // _data["LEDState"] = quantity ? "on" : "off";
+        // _data["LEDChannel"] = "";
+
         xTimerChangePeriod(_timer, 3*1000, 0);
     }
 

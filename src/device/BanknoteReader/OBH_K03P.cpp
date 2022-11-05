@@ -47,7 +47,6 @@ int OBH_K03P::initialized() {
     pinMode(_vendPin, INPUT_PULLUP);
     pinMode(_errorPin, INPUT_PULLUP);
 
-    _q = xQueueCreate(16, 0);
     _timer = xTimerCreate(
          /* Just a text name, not used by the RTOS
         kernel. */

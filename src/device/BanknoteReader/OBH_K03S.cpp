@@ -11,7 +11,7 @@ void OBH_K03S::sendCommand(const char* cmd) {
     };
     _buf[4] = checksum(_buf);
     _serial->write(_buf, 5);
-    Serial.printf("%c %c %c %d %d\n\r", _buf[0], _buf[1], _buf[2], _buf[3], _buf[4]);
+    Serial.printf("write %c %c %c %d %d\n\r", _buf[0], _buf[1], _buf[2], _buf[3], _buf[4]);
 }
 
 int OBH_K03S::initialized() {
@@ -45,6 +45,11 @@ int OBH_K03S::initialized() {
 int OBH_K03S::getBillData() {
     char _buf[5];
     while(1) {
+        if( !_serial->available() ) {
+            delay(50);
+            continue;
+        }
+
         if (process(_buf) < 0)
             continue;
 
@@ -67,7 +72,7 @@ void OBH_K03S::disable() {
 
 int OBH_K03S::process(char _buf[5]) {
     _serial->readBytes(_buf, 5);
-    Serial.printf("%c %c %c %d %d\n\r", _buf[0], _buf[1], _buf[2], _buf[3], _buf[4]);
+    Serial.printf("read %c %c %c %d %d\n\r", _buf[0], _buf[1], _buf[2], _buf[3], _buf[4]);
     if (checksum(_buf) != _buf[4]) {
         Serial.println("OHB_K03S checksum error");
         return -1;

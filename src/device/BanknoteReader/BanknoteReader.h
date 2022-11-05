@@ -2,6 +2,7 @@
 #define BANKNOTE_READER_H
 #include <FreeRTOS.h>
 #include <task.h>
+#include <queue.h>
 
 #include <functional>
 #include <vector>
@@ -12,7 +13,9 @@ private:
     std::vector<std::function<void(const int)> > _onRecognizedBankNotes;
     TaskHandle_t _eventTask;
 public:
+    QueueHandle_t _q;
     std::string _name;
+
     void notifyBillData();
 
     void registerBillDataCallBack(std::function<void(const int)> onRecognizedBankNote);

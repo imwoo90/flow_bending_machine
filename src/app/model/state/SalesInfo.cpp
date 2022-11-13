@@ -22,12 +22,22 @@ SalesInfo* SalesInfo::getInstance() {
 MachineState* SalesInfo::pressKey(const char key) {
     const bool changePasword = true;
     MachineState* next = this;
+
     switch ( key ) {
     case '*':
         next = MainManagement::getInstance();
         break;
     case '#':
-        //3초간 눌렀을때 초기화
+        //3초간 눌렀을때 초기화 구현 필요함
+
+        _database->setNumberOfTotalSales(0);
+        _database->setMoneyOfTotalSales(0);
+        _database->setNumberOfManualSales(0);
+        _database->setMoneyOfManualSales(0);
+        _data["param_0"] = "0";
+        _data["param_1"] = "0";
+        _data["param_2"] = "0";
+        _data["param_3"] = "0";
         break;
     }
     return next;

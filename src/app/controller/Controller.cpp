@@ -21,31 +21,50 @@ void Controller::putMessage(MessageType type, int data, int delay_ms) {
     MessageCallbackData *p = new MessageCallbackData();
     p->q = _q; p->msg.type = type; p->msg.data = data;
 
-    if (delay_ms <= 0)
-        delay_ms = 1;
-    TimerHandle_t xTimer = xTimerCreate
-    ( /* Just a text name, not used by the RTOS
-        kernel. */
-        "putMessage",
-        /* The timer period in ticks, must be
-        greater than 0. */
-        delay_ms / portTICK_PERIOD_MS,
-        /* The timers will auto-reload themselves
-        when they expire. */
-        pdFALSE,
-        /* The ID is used to store a count of the
-        number of times the timer has expired, which
-        is initialised to 0. */
-        p,
-        /* Each timer calls the same callback when
-        it expires. */
-        putMessageCallback
-    );
-    xTimerStart(xTimer, 0);
+    if (delay_ms <= 0) {
+        if(_isISR)
+            xQueueSendFromISR(p->q, &p->msg, NULL);
+        else
+            xQueueSend(p->q, &p->msg, 0);
+    } else {
+        TimerHandle_t xTimer = xTimerCreate
+        ( /* Just a text name, not used by the RTOS
+            kernel. */
+            "putMessage",
+            /* The timer period in ticks, must be
+            greater than 0. */
+            delay_ms / portTICK_PERIOD_MS,
+            /* The timers will auto-reload themselves
+            when they expire. */
+            pdFALSE,
+            /* The ID is used to store a count of the
+            number of times the timer has expired, which
+            is initialised to 0. */
+            p,
+            /* Each timer calls the same callback when
+            it expires. */
+            putMessageCallback
+        );
+
+        if(_isISR)
+            xTimerStartFromISR(xTimer, 0);
+        else
+            xTimerStart(xTimer, 0);
+    }
+}
+
+static int channel_swMotorInterrupt;
+static void motorRoundCallback(Controller* p) {
+    p->_isISR = true;
+    p->putMessage(MessageRelayClose, channel_swMotorInterrupt);
+    p->_isISR = false;
 }
 
 int Controller::setupMachine() {
     _machine = FlowVendingMachine::getInstance();
+    // pinMode(2, INPUT_PULLUP);
+    // attachInterrupt(2, motorRoundCallback, FALLING, this);
+
     auto onChangedCallback = [&](std::unordered_map<std::string, std::string> data) {
         Serial.printf("%s\r\n", data["state"].c_str());
 
@@ -63,19 +82,10 @@ int Controller::setupMachine() {
             putMessage(MessageRelayOpen, channel);
             putMessage(MessageRelayClose, channel, 500);
         } else if(data["LockerType"] == "2") { // relay (mortor)
-            static bool _interruptInitial = false;
-            static int channel_swMotorInterrupt;
-            if(!_interruptInitial) {
-                pinMode(2, INPUT_PULLUP);
-                auto motorRoundCallback = []() {
-                    Controller::getInstance()->putMessage(MessageRelayClose, channel_swMotorInterrupt);
-                };
-                attachInterrupt(2, motorRoundCallback, FALLING);
-                _interruptInitial = true;
-            }
-
             channel_swMotorInterrupt = std::stoi(data["LockerChannel"]);
             putMessage(MessageRelayOpen, channel_swMotorInterrupt);
+            putMessage(MessageRelayClose, channel_swMotorInterrupt, 6300);
+            // The motorRoundCallback must be called after above code is working
         }
 
         if(data["LEDState"] == "on") { // relay (LED)
@@ -84,6 +94,10 @@ int Controller::setupMachine() {
         } else if(data["LEDState"] == "off") {
             int channel = std::stoi(data["LEDChannel"]);
             putMessage(MessageRelayClose, channel);
+        }
+
+        if(data["keyEvent"] != "") {
+            putMessage(MessageKeypadPress, data["keyEvent"][0], 1000);
         }
     };
     auto onTimeoutCallback = [&](const int signal) {
@@ -145,7 +159,11 @@ int Controller::setupRelays() {
     for (int i = 0; i < nRelays; i++) {
         int numOfCh = _machine->_database->getNumberOfChannels(i);
         Serial.printf("num of ch %d \n\r", numOfCh);
+
+        //Toto set relay type by database
         _relays.push_back(new R4D3B16(i+1, numOfCh, Serial1)); //i + 1 is relay address
+        for (int j = 0; j < numOfCh; j++)
+            _relays[i]->close(j+1);
     }
     return 0;
 }
@@ -202,6 +220,8 @@ void Controller::processModel(Message &Message) {
     case MessageTimeout:
         _machine->timeout(Message.data);
         break;
+    case MessageTEST:
+        break;
     }
 }
 
@@ -222,6 +242,7 @@ void Controller::operateDevice(Message &Message) {
         int channel = Message.data;
         auto r_ch = convertChannelToRelayFromModel(channel);
         _relays[r_ch.first]->close(r_ch.second);
+        Serial.println("relay close");
         break;
     } default:
         break;

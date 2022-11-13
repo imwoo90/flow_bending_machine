@@ -7,8 +7,8 @@ void AdditionalStock::initialize() {
     // init data
     _data.clear();
     _data["state"] = "AdditionalStock";
-    _data["param_0"] = "001"; // 001 column
-    _data["param_1"] = itoa(_database->getPrice(1), price, 10); // 1 column price
+    _data["param_0"] = "000"; // 001 column
+    _data["param_1"] = "000000";
     _data["param_2"] = "00"; // number of goods
     _selection = 0;
 }
@@ -20,25 +20,30 @@ AdditionalStock* AdditionalStock::getInstance() {
 }
 
 MachineState* AdditionalStock::pressKey(const char key) {
-    char price[32];
-    int column, numOfGoods;
+    char buf[32];
+    int column, addGoods;
     MachineState* next = this;
     switch ( key ) {
     case '*':
         next = SystemSetting::getInstance();
         break;
     case '#':
-        if (_selection == 1) {
-            //save additional stock
-            column = std::stoi(_data["param_0"]);
-            numOfGoods = std::stoi(_data["param_2"]);
-            numOfGoods += _database->getAdditional(column);
-            _database->setAdditional(column, numOfGoods);
+        if (_selection == 0) {
+            column = std::stoi(_data["param_0"])-1;
+            if (0 <= column && column < _database->getNumberOfColumns()) {
+                int price = _database->getPrice(column);
+                if (price <= 0)
+                    break;
+
+                _data["param_1"] = itoa(price, buf, 10);
+                _selection = 2;
+            }
+        } else if (_selection == 2) {
+            column = std::stoi(_data["param_0"])-1;
+            addGoods = std::stoi(_data["param_2"]);
+            addGoods += _database->getAdditional(column);
+            _database->setAdditional(column, addGoods);
             _selection = 0;
-        } else {
-            column = std::stoi(_data["param_0"]);
-            _data["param_1"] = itoa(_database->getPrice(column), price, 10);
-            _selection = 1;
         }
         break;
     default: {//1~9

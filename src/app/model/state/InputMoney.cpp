@@ -74,7 +74,7 @@ MachineState* InputMoney::recognizeBanknote(const int banknote) {
         // _data["LEDState"] = quantity ? "on" : "off";
         // _data["LEDChannel"] = "";
 
-        xTimerChangePeriod(_timer, 3*1000, 0);
+        xTimerChangePeriod(_timer, 2*1000, 0);
     }
 
     xTimerStart(_timer, 0);
@@ -83,6 +83,11 @@ MachineState* InputMoney::recognizeBanknote(const int banknote) {
 
 MachineState* InputMoney::pressKey(const char key) {
     MachineState* next = this;
+    _data["LockerType"] = "";
+    _data["LockerChannel"] = "";
+    // To do this
+    // _data["LEDState"] = quantity ? "on" : "off";
+    // _data["LEDChannel"] = "";
     switch ( key ) {
     case '*':
         if ( xTimerIsTimerActive(_timer) == pdFALSE )

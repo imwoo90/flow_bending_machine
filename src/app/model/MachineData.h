@@ -2,51 +2,64 @@
 
 #include <Arduino.h>
 
+//PasswordOfVendingMachineModeSetting too long file name
+// PasswordOfVendingMachineModeSetting - > PasswordOfVMMS
+#define STATIC_DATA\
+    X(IsInit)\
+    X(PasswordOfSystemManagement)\
+    X(PasswordOfSystemSetting)\
+    X(PasswordOfVMMS)\
+    X(PasswordOfMainManagement)\
+    X(PasswordOfAdditionalStock)\
+    X(PasswordOfManualSales)\
+    X(PasswordOfPasswordChange)\
+    X(BanknoteReaderMode)\
+    X(NumberOfRelay)\
+    X(MoneyOfTotalSales)\
+    X(NumberOfTotalSales)\
+    X(MoneyOfManualSales)\
+    X(NumberOfManualSales)
+
+#define COLUMN_DATA\
+    X(MotorTpye)\
+    X(Quantity)\
+    X(Price)\
+    X(Channel)\
+    X(Additional)\
+    X(SalesAmount)
+
+#define RELAY_DATA\
+    X(NumberOfChannels)\
+    X(RelayType)
+
+
+#define X(name) name,
 typedef enum {
-    Quantity,
-    Price = Quantity+4,
-    Channel = Price+4,
-    Additional = Channel+4,
-    SalesAmount = Additional+4,
-} ColumDataPos;
+    STATIC_DATA
+} StaticData;
+typedef enum {
+    COLUMN_DATA
+} ColumData;
 
 typedef enum {
-    NumberOfChannels,
-    MotorType = NumberOfChannels+4,
-} RelayDataPos;
-
-typedef enum {
-    PasswordOfSystemManagement = 0,
-    PasswordOfSystemSetting = PasswordOfSystemManagement+4,
-    PasswordOfVendingMachineModeSetting = PasswordOfSystemSetting+4,
-    PasswordOfMainManagement = PasswordOfVendingMachineModeSetting+4,
-    PasswordOfAdditionalStock = PasswordOfMainManagement+4,
-    PasswordOfManualSales = PasswordOfAdditionalStock+4,
-    PasswordOfPasswordChange = PasswordOfManualSales+4,
-    BanknoteReaderMode = PasswordOfPasswordChange+4,
-    NumberOfRelay = BanknoteReaderMode+4,
-    MoneyOfTotalSales = NumberOfRelay+4,
-    NumberOfTotalSales = MoneyOfTotalSales+4,
-    MoneyOfManualSales = NumberOfTotalSales+4,
-    NumberOfManualSales = MoneyOfManualSales+4,
-} StaticLengthDataPos;
+    RELAY_DATA
+} RelayData;
+#undef X
 
 class MachineData {
 private:
-    const uint32_t _kRelayDataSize = MotorType+4;
-    const uint32_t _kColumeDataSize = SalesAmount+4;
     uint32_t _numberOfRelays = 0;
     uint32_t _numberOfColumns = 0;
 
     //static length data
-    void setStaticData(StaticLengthDataPos pos, uint32_t data);
-    uint32_t getStaticData(StaticLengthDataPos pos);
+    void setStaticData(StaticData pos, uint32_t data);
+    uint32_t getStaticData(StaticData pos);
 
     //dynamic length data
-    uint32_t getRelayData(int idx, RelayDataPos pos);
-    uint32_t getColumnData(int idx, ColumDataPos pos);
-    void setRelayData(int idx, RelayDataPos pos, uint32_t data);
-    void setColumnData(int idx, ColumDataPos pos, uint32_t data);
+    uint32_t getRelayData(int idx, RelayData pos);
+    uint32_t getColumnData(int idx, ColumData pos);
+    void setRelayData(int idx, RelayData pos, uint32_t data);
+    void setColumnData(int idx, ColumData pos, uint32_t data);
 
     MachineData() {}
 public:
@@ -61,11 +74,13 @@ public:
     void initialize();
 
     //ColumData
+    uint32_t getMotorType(int idx);
     uint32_t getQuantity(int idx);
     uint32_t getPrice(int idx);
     uint32_t getChannel(int idx);
     uint32_t getAdditional(int idx);
     uint32_t getSalesAmount(int idx);
+    void setMotorType(int idx, uint32_t data);
     void setQuantity(int idx, uint32_t data);
     void setPrice(int idx, uint32_t data);
     void setChannel(int idx, uint32_t data);
@@ -74,9 +89,9 @@ public:
 
     //RelayData
     uint32_t getNumberOfChannels(int idx);
-    uint32_t getMotorType(int idx);
+    uint32_t getRelayType(int idx);
     void setNumberOfChannels(int idx, uint32_t data);
-    void setMotorType(int idx, uint32_t data);
+    void setRelayType(int idx, uint32_t data);
 
     // StaticLengthData
     uint32_t getPasswordOfSystemManagement();

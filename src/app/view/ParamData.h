@@ -3,7 +3,7 @@
 #include "resource.h"
 
 struct ParamData {
-    uint8_t interval;
+    int16_t interval;
     uint16_t x, y;
     const uint8_t* font;
 };

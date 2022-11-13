@@ -52,18 +52,16 @@ MachineState* EnterProductNumber::pressKey(const char key) {
     MachineState* next = this;
     switch ( key ) {
     case '#': {
-        std::string &param_0 = _data["param_0"];
-        int n = std::stoi(param_0);
-        if ( n < _database->getNumberOfColumns() ) {
-            //check goods number
-            n -= 1; //change goods number == column number
-            if (_database->getQuantity(n) > 0) {
+        int n = std::stoi(_data["param_0"])-1;
+        if ( n+1 == _database->getPasswordOfSystemManagement() ){
+            next = EnterPasswordOfSystemSetting::getInstance();
+            break;
+        } else if ( 0 <= n && n < _database->getNumberOfColumns() ) {
+            int total_quantity = _database->getQuantity(n) + _database->getAdditional(n);
+            if (total_quantity > 0) {
                 next =InputMoney::getInstance(n);
                 break;
             }
-        } else if ( n == _database->getPasswordOfSystemManagement() ){
-            next = EnterPasswordOfSystemSetting::getInstance();
-            break;
         }
         xTimerStart(_timer, 0);
         break;}

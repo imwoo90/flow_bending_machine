@@ -1,6 +1,8 @@
 #include "ListOfAdditionalStock.h"
 
-#include "VendingMachineModeSetting.h"
+#include "MainManagement.h"
+
+#define NUMBER_PER_PAGE 8
 
 void ListOfAdditionalStock::initialize() {
     // init data
@@ -28,32 +30,44 @@ MachineState* ListOfAdditionalStock::pressKey(const char key) {
         break;
     case '2':
         _page += 1;
-        if (16*_page > _database->getNumberOfColumns()) {
+        if (NUMBER_PER_PAGE*_page >= _database->getNumberOfColumns()) {
             _page -= 1;
             break;
         }
         loadListOfAdditionalStock();
         break;
+    case '#':
+        //5초간 눌렀을때 초기화 구현 해야함
+        for (int column = 0; column < _database->getNumberOfColumns(); column++)
+            _database->setAdditional(column, 0);
+
+        loadListOfAdditionalStock();
+        break;
     case '*':
-        next = VendingMachineModeSetting::getInstance();
+        next = MainManagement::getInstance();
         break;
     }
     return next;
 }
 
 void ListOfAdditionalStock::loadListOfAdditionalStock() {
-    // int column = 0;
-    // int numOfRelay = _database->getNumberOfRelays();
-    // for (int i = 0; i < numOfRelay; i++) {
-    //     int numOfChannels = _database->getNumberOfChannels(i);
-    //     int motorType = _database->getMotorType(i);
-    //     for (int j = 0; j < numOfChannels; j++) {
-    //         int channel = _database->getChannel(column);
+    char buf[32];
+    int param_index = 0;
+    std::string param;
+    std::string prefix = "param_";
+    for (int i = 0; i < NUMBER_PER_PAGE; i++) {
+        int column = _page*NUMBER_PER_PAGE + i;
+        int price = _database->getPrice(column);
+        int additional = _database->getAdditional(column);
 
-    //         column += 1;
-    //     }
-    // }
-
-    // Not implemented yet
-
+        column += 1;// match user's recognize column
+        param = prefix + itoa(param_index++, buf, 10);
+        _data[param] = itoa(column, buf, 10);
+        param = prefix + itoa(param_index++, buf, 10);
+        _data[param] = itoa(price/1000, buf, 10);
+        param = prefix + itoa(param_index++, buf, 10);
+        _data[param] = itoa(additional, buf, 10);
+    }
+    param = prefix + itoa(param_index++, buf, 10);
+    _data[param] = std::string("p")+itoa(_page+1, buf, 10);
 }

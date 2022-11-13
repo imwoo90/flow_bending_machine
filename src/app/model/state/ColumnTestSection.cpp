@@ -6,10 +6,9 @@ void ColumnTestSection::initialize() {
     // init data
     _data.clear();
     _data["state"] = "ColumnTestSection";
-    _data["param_0"] = "end";
+    _data["param_0"] = "000";
     _data["param_1"] = "000";
-    _data["param_2"] = "000";
-    _selection = 1;
+    _selection = 0;
 }
 
 ColumnTestSection* ColumnTestSection::getInstance() {
@@ -19,28 +18,56 @@ ColumnTestSection* ColumnTestSection::getInstance() {
 }
 
 MachineState* ColumnTestSection::pressKey(const char key) {
+    static int column_s, column_e, column, running_test = false;
+    char buf[32];
     MachineState* next = this;
-    _data["param_0"] = "end";
+
+    _data["LockerType"] = "";
+    _data["LockerChannel"] = "";
+    _data["keyEvent"] = "";
     switch ( key ) {
+    case 'L': // loop column_s ~ column_e
+        if (running_test == false)
+            break;
+
+        _data["LockerType"] = itoa(_database->getMotorType(column), buf, 10);
+        _data["LockerChannel"] = itoa(_database->getChannel(column), buf, 10);
+        if (column < column_e) {
+            _data["keyEvent"] = "L";
+        } else {
+            running_test = false;
+        }
+        column += 1;
+        break;
     case '#':
-        if (_selection == 1) {
-            _selection = 2;
-        } else if (_selection == 2) {
-            int column1 = std::stoi(_data["param_1"]) - 1;
-            int column2 = std::stoi(_data["param_2"]) - 1;
-            if (!(0 <= column1 && column1 < _database->getNumberOfColumns())) {
-                break;
-            } else if (!(0 <= column2 && column2 < _database->getNumberOfColumns())) {
+        if (running_test == true)
+            break;
+
+        if (_selection == 0) {
+            _selection = 1;
+        } else if (_selection == 1) {
+            column_s = std::stoi(_data["param_0"]) - 1;
+            column_e = std::stoi(_data["param_1"]) - 1;
+            if (!(0 <= column_s && column_s < _database->getNumberOfColumns())) {
                 break;
             }
-            _data["param_0"] = "start";
-            _selection = 1;
+            if (!(0 <= column_e && column_e < _database->getNumberOfColumns())) {
+                break;
+            }
+            _selection = 0;
+            _data["keyEvent"] = "L";
+            column = column_s;
+            running_test = true;
         }
         break;
     case '*':
+        running_test = false;
         next = WorkingTest::getInstance();
         break;
     default: {//1~9
+        if (running_test == true)
+            break;
+
         char param[] = "param_0";
         param[6] = '0' + _selection;
         std::string &param_0 = _data[param];

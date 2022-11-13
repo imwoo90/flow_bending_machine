@@ -21,6 +21,7 @@ typedef enum {
     MessageBanknoteReaderDisable,
     MessageRelayOpen,
     MessageRelayClose,
+    MessageTEST,
 } MessageType;
 
 struct Message {
@@ -70,7 +71,8 @@ public:
         return &singleton_instance;
     }
 
-    void putMessage(MessageType type, int data, int delay_ms = 1);
+    bool _isISR = false;
+    void putMessage(MessageType type, int data, int delay_ms = 0);
 
     void setup();
     void loop();

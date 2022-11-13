@@ -8,7 +8,7 @@ void SetGoods::initialize() {
     _data.clear();
     _data["state"] = "SetGoods";
     _data["param_0"] = "000";
-    _data["param_1"] = "000";
+    _data["param_1"] = "000000";
     _data["param_2"] = "00";
     _selection = 0;
 }
@@ -35,26 +35,30 @@ MachineState* SetGoods::pressKey(const char key) {
             }
         } else if ( _selection == 1) {
             int column = std::stoi(_data["param_0"]) - 1;
-            int price = std::stoi(_data["param_1"]) * 1000;
+            int price = std::stoi(_data["param_1"]);
             if (price <= 500000) {
-                _database->setPrice(column, price);
-                Serial.printf("%d \n\r", _database->getPrice(column));
                 _selection = 2;
             }
         } else if ( _selection == 2) {
             int column = std::stoi(_data["param_0"]) - 1;
             int quantity = std::stoi(_data["param_2"]);
             _database->setQuantity(column, quantity);
+            _database->setPrice(column, std::stoi(_data["param_1"]));
             Serial.printf("%d \n\r", _database->getQuantity(column));
+            Serial.printf("%d \n\r", _database->getPrice(column));
             _selection = 0;
         }
         break;
     default: {//1~9
-        char param[] = "param_0";
-        param[6] = '0' + _selection;
-        std::string &param_0 = _data[param];
-        rotate(param_0.begin(), param_0.begin()+1, param_0.end());
-        param_0[param_0.length()-1] = key;
+        char param_idx[] = "param_0";
+        param_idx[6] = '0' + _selection;
+        std::string &param = _data[param_idx];
+        int size = param.size();
+        if(_selection == 1)
+            size = 3;
+
+        rotate(param.begin(), param.begin()+1, param.begin() + size);
+        param[size-1] = key;
         break;}
     }
     return next;

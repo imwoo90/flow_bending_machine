@@ -1,5 +1,6 @@
 #include "Display.h"
 #include "ParamData.h"
+#include <algorithm>
 
 inline ResourceType getResourceType(std::string &s_rsrc) {
     static const std::unordered_map<std::string, ResourceType> _getResourceType = {
@@ -42,10 +43,19 @@ void Display::drawParamDatas(ResourceType bg, std::unordered_map<std::string, st
         uint16_t x = paramDatas[i].x;
         uint16_t y = paramDatas[i].y;
         char str_c_tmp[2] = {0};
-        for(auto c : it->second) {
-            str_c_tmp[0] = c;
-            u8g2.drawStr(x, y, str_c_tmp);
-            x += paramDatas[i].interval;
+        int interval = paramDatas[i].interval;
+        if ( interval >= 0) {
+            for (auto _c = it->second.begin(); _c != it->second.end(); _c++) {
+                str_c_tmp[0] = *_c;
+                u8g2.drawStr(x, y, str_c_tmp);
+                x += interval;
+            }
+        } else {
+            for (auto _c = it->second.rbegin(); _c != it->second.rend(); _c++) {
+                str_c_tmp[0] = *_c;
+                u8g2.drawStr(x, y, str_c_tmp);
+                x += interval;
+            }
         }
     }
 }

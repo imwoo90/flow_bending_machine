@@ -1,6 +1,6 @@
 #include "SystemSetting.h"
 
-#include "EnterProductNumber.h"
+#include "Selling.h"
 
 #include "EnterPasswordOfVendingMachineModeSetting.h"
 #include "EnterPasswordOfMainManagement.h"
@@ -23,7 +23,7 @@ MachineState* SystemSetting::pressKey(const char key) {
     MachineState* next = this;
     switch ( key ) {
     case '*':
-        next = EnterProductNumber::getInstance();
+        next = Selling::getInstance();
         break;
     case '1':
         next = EnterPasswordOfVendingMachineModeSetting::getInstance();

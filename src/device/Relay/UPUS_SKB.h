@@ -15,7 +15,7 @@ private:
         return (uint8_t)(_buf[0] ^ _buf[1] ^ _buf[2] ^ _buf[3]);
     }
 public:
-    UPUS_SKB(uint8_t id, Stream &serial, void(*preTx)(), void(*postTx)());
+    UPUS_SKB(uint8_t id, int numOfChannels, Stream &serial, void(*preTx)(), void(*postTx)());
     virtual uint8_t open(uint16_t addr);
     virtual uint8_t close(uint16_t addr);
 };

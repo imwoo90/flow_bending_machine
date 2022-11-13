@@ -1,6 +1,7 @@
 #include "UPUS_SKB.h"
 
-UPUS_SKB::UPUS_SKB(uint8_t id, Stream &serial, void(*preTx)(), void(*postTx)()) {
+UPUS_SKB::UPUS_SKB(uint8_t id, int numOfChannels, Stream &serial, void(*preTx)(), void(*postTx)()) {
+    _numOfChannels = numOfChannels;
     _id = id;
     _serial = &serial;
     _preTransmission = preTx;

@@ -4,7 +4,6 @@
 #include "BanknoteReader.h"
 
 #include <FreeRTOS.h>
-#include <queue.h>
 #include <timers.h>
 
 class OBH_K03P : public BanknoteReader {
@@ -15,7 +14,6 @@ private:
 
     OBH_K03P() {};
 public:
-    QueueHandle_t _q;
     TimerHandle_t _timer;
     int _cntPulse;
 

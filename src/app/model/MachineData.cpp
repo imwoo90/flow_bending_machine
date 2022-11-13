@@ -1,21 +1,33 @@
 #include <MachineData.h>
 #include <LittleFS.h>
 
-#define STATIC_LENGTH_DATA "/static_length_data.bin"
-#define COLUMN_DATA "/column_data.bin"
-#define RELAY_DATA "/relay_data.bin"
+#define X(name) #name,
+static const char* preFixStaticData[] = {
+    STATIC_DATA
+};
+static const char* preFixColumData[] = {
+    COLUMN_DATA
+};
+
+static const char* preFixRelayData[] = {
+    RELAY_DATA
+};
+#undef X
+
+String root = "/";
 
 void MachineData::defineDefaultsData() {
+    delay(5000);
+    Serial.println("little fs format start");
     if ( !LittleFS.format() ) {
         Serial.println("little fs format failed");
         return ;
     }
+    Serial.println("little fs format end");
 
     //default static length data
     const int numOfDefaultRelay = 2;
-    File staticF = LittleFS.open(STATIC_LENGTH_DATA, "w");
-    staticF.truncate(NumberOfManualSales+4);
-    staticF.close();
+    setStaticData(IsInit, 1);
     setPasswordOfSystemManagement(999);
     setPasswordOfSystemSetting(1234);
     setPasswordOfVendingMachineModeSetting(12345678);
@@ -31,21 +43,18 @@ void MachineData::defineDefaultsData() {
     setNumberOfManualSales(0);
 
     //default relay settings
-    File relayF = LittleFS.open(RELAY_DATA, "w");
-    relayF.close();
     const int numOfDefaultChannels = 16;
     const int defaultMotorType = 1;
     int nRelay = getNumberOfRelay();
     for (int i = 0; i < nRelay; i++) {
         setNumberOfChannels(i, numOfDefaultChannels);
-        setMotorType(i, defaultMotorType);
+        setRelayType(i, defaultMotorType);
     }
 
     //default column settings
-    File columnF = LittleFS.open(COLUMN_DATA, "w");
-    columnF.close();
     const int numOfColumns = numOfDefaultRelay*numOfDefaultChannels;
     for (int i = 0; i < numOfColumns; i++) {
+        setMotorType(i, 1);
         setQuantity(i, 0);
         setPrice(i, 0);
         setChannel(i, i);
@@ -58,7 +67,10 @@ void MachineData::initialize() {
         Serial.println("LittleFS.begin() failed");
         return;
     }
-    if ( !LittleFS.exists(STATIC_LENGTH_DATA) ) {
+
+    // LittleFS.remove("/IsInit");
+
+    if ( !LittleFS.exists(root+preFixStaticData[IsInit]) ) {
         defineDefaultsData();
     }
 
@@ -69,106 +81,68 @@ void MachineData::initialize() {
     }
 }
 
-void MachineData::setStaticData(StaticLengthDataPos pos, uint32_t data) {
-    File staticF = LittleFS.open(STATIC_LENGTH_DATA, "r+");
-    staticF.seek(pos);
-    staticF.write((uint8_t*)&data, sizeof(data));
-    staticF.close();
+void MachineData::setStaticData(StaticData id, uint32_t data) {
+    File _file = LittleFS.open(root+preFixStaticData[id], "w");
+    _file.write((uint8_t*)&data, sizeof(data));
+    _file.flush();
+    // _file.close();
 }
-uint32_t MachineData::getStaticData(StaticLengthDataPos pos) {
+uint32_t MachineData::getStaticData(StaticData id) {
     uint32_t buf = 0;
-    File staticF = LittleFS.open(STATIC_LENGTH_DATA, "r");
-    staticF.seek(pos);
-    staticF.read((uint8_t*)&buf, sizeof(buf));
-    staticF.close();
+    File _file = LittleFS.open(root+preFixStaticData[id], "r");
+    _file.read((uint8_t*)&buf, sizeof(buf));
+    // _file.close();
     return buf;
 }
-uint32_t MachineData::getColumnData(int idx, ColumDataPos pos) {
-    if ( _numberOfColumns < idx) {
-        Serial.println("Colume Index Overflow");
-        return -1;
-    }
+uint32_t MachineData::getColumnData(int idx, ColumData id) {
+    char tmp[32];
+    String path = root + preFixColumData[id];
+    String idx_str = itoa(idx, tmp, 10);
+    File _file = LittleFS.open(path+idx_str, "r");
 
     uint32_t buf = 0;
-    File columnF = LittleFS.open(COLUMN_DATA, "r+");
-    int diff =  _numberOfColumns*_kColumeDataSize - columnF.size();
-    if ( diff > 0 ) {
-        columnF.seek(SeekEnd);
-        columnF.truncate(_numberOfColumns*_kColumeDataSize);
-        std::vector<uint8_t> dummy(diff, 0);
-        columnF.write(&dummy[0], dummy.size());
-    } else if ( diff < 0 )
-        columnF.truncate(_numberOfColumns*_kColumeDataSize);
-
-    columnF.seek(_kColumeDataSize*idx+pos);
-    columnF.read((uint8_t*)&buf, sizeof(buf));
-    columnF.close();
+    _file.read((uint8_t*)&buf, sizeof(buf));
+    // _file.close();
     return buf;
 }
-uint32_t MachineData::getRelayData(int idx, RelayDataPos pos) {
-    if ( _numberOfRelays < idx ) {
-        Serial.println("Relay Index Overflow");
-        return -1;
-    }
+uint32_t MachineData::getRelayData(int idx, RelayData id) {
+    char tmp[32];
+    String path = root + preFixRelayData[id];
+    String idx_str = itoa(idx, tmp, 10);
+    File _file = LittleFS.open(path+idx_str, "r");
 
     uint32_t buf = 0;
-    File relayF = LittleFS.open(RELAY_DATA, "r+");
-    int diff = _numberOfRelays*_kRelayDataSize - relayF.size();
-    if ( diff > 0 ) {
-        relayF.seek(SeekEnd);
-        relayF.truncate(_numberOfRelays*_kRelayDataSize);
-        std::vector<uint8_t> dummy(diff, 0);
-        relayF.write(&dummy[0], dummy.size());
-    } else if ( diff < 0 )
-        relayF.truncate(_numberOfRelays*_kRelayDataSize);
-
-    relayF.seek(_kRelayDataSize*idx+pos);
-    relayF.read((uint8_t*)&buf, sizeof(buf));
-    relayF.close();
+    _file.read((uint8_t*)&buf, sizeof(buf));
+    // _file.close();
     return buf;
 }
-void MachineData::setColumnData(int idx, ColumDataPos pos, uint32_t data) {
-    if ( _numberOfColumns < idx) {
-        Serial.println("Colume Index Overflow");
-        return;
-    }
+void MachineData::setColumnData(int idx, ColumData id, uint32_t data) {
+    char tmp[32];
+    String path = root + preFixColumData[id];
+    String idx_str = itoa(idx, tmp, 10);
+    File _file = LittleFS.open(path+idx_str, "w");
 
-    File columnF = LittleFS.open(COLUMN_DATA, "r+");
-    int diff =  _numberOfColumns*_kColumeDataSize - columnF.size();
-    if ( diff > 0 ) {
-        columnF.seek(SeekEnd);
-        columnF.truncate(_numberOfColumns*_kColumeDataSize);
-        std::vector<uint8_t> dummy(diff, 0);
-        columnF.write(&dummy[0], dummy.size());
-    } else if ( diff < 0 )
-        columnF.truncate(_numberOfColumns*_kColumeDataSize);
-
-    columnF.seek(_kColumeDataSize*idx+pos);
-    columnF.write((uint8_t*)&data, sizeof(data));
-    columnF.close();
+    uint32_t buf = 0;
+    _file.write((uint8_t*)&data, sizeof(data));
+    _file.flush();
+    // _file.close();
 }
-void MachineData::setRelayData(int idx, RelayDataPos pos, uint32_t data) {
-    if ( _numberOfRelays < idx ) {
-        Serial.println("Relay Index Overflow");
-        return;
-    }
+void MachineData::setRelayData(int idx, RelayData id, uint32_t data) {
+    char tmp[32];
+    String path = root + preFixRelayData[id];
+    String idx_str = itoa(idx, tmp, 10);
+    File _file = LittleFS.open(path+idx_str, "w");
 
-    File relayF = LittleFS.open(RELAY_DATA, "r+");
-    int diff = _numberOfRelays*_kRelayDataSize - relayF.size();
-    if ( diff > 0 ) {
-        relayF.seek(SeekEnd);
-        relayF.truncate(_numberOfRelays*_kRelayDataSize);
-        std::vector<uint8_t> dummy(diff, 0);
-        relayF.write(&dummy[0], dummy.size());
-    } else if ( diff < 0 )
-        relayF.truncate(_numberOfRelays*_kRelayDataSize);
-
-    relayF.seek(_kRelayDataSize*idx+pos);
-    relayF.write((uint8_t*)&data, sizeof(data));
-    relayF.close();
+    uint32_t buf = 0;
+    _file.write((uint8_t*)&data, sizeof(data));
+    _file.flush();
+    // _file.close();
 }
 
 //ColumData
+uint32_t MachineData::getMotorType(int idx) {
+    return getColumnData(idx, MotorTpye);
+}
 uint32_t MachineData::getQuantity(int idx) {
     return getColumnData(idx, Quantity);
 }
@@ -183,6 +157,9 @@ uint32_t MachineData::getAdditional(int idx) {
 }
 uint32_t MachineData::getSalesAmount(int idx) {
     return getColumnData(idx, SalesAmount);
+}
+void MachineData::setMotorType(int idx, uint32_t data) {
+    setColumnData(idx, MotorTpye, data);
 }
 void MachineData::setQuantity(int idx, uint32_t data) {
     setColumnData(idx, Quantity, data);
@@ -204,16 +181,16 @@ void MachineData::setSalesAmount(int idx, uint32_t data) {
 uint32_t MachineData::getNumberOfChannels(int idx) {
     return getRelayData(idx, NumberOfChannels);
 }
-uint32_t MachineData::getMotorType(int idx) {
-    return getRelayData(idx, MotorType);
+uint32_t MachineData::getRelayType(int idx) {
+    return getRelayData(idx, RelayType);
 }
 void MachineData::setNumberOfChannels(int idx, uint32_t data) {
     int before = getNumberOfChannels(idx);
     setRelayData(idx, NumberOfChannels, data);
     _numberOfColumns -= (before-data);
 }
-void MachineData::setMotorType(int idx, uint32_t data) {
-    setRelayData(idx, MotorType, data);
+void MachineData::setRelayType(int idx, uint32_t data) {
+    setRelayData(idx, RelayType, data);
 }
 
 // StaticLengthData
@@ -226,7 +203,7 @@ uint32_t MachineData::getPasswordOfSystemSetting() {
 }
 
 uint32_t MachineData::getPasswordOfVendingMachineModeSetting() {
-    return getStaticData(PasswordOfVendingMachineModeSetting);
+    return getStaticData(PasswordOfVMMS);
 }
 
 uint32_t MachineData::getPasswordOfMainManagement() {
@@ -269,7 +246,7 @@ void MachineData::setPasswordOfSystemSetting(uint32_t password) {
     setStaticData(PasswordOfSystemSetting, password);
 }
 void MachineData::setPasswordOfVendingMachineModeSetting(uint32_t password) {
-    setStaticData(PasswordOfVendingMachineModeSetting, password);
+    setStaticData(PasswordOfVMMS, password);
 }
 void MachineData::setPasswordOfMainManagement(uint32_t password) {
     setStaticData(PasswordOfMainManagement, password);

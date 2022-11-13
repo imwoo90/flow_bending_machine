@@ -6,7 +6,7 @@ void Selling::initialize() {
     // init data
     _data.clear();
     _data["state"] = "Selling";
-    _data["cmd"] == "disable_bill";
+    _data["BanknoteReader"] = "disable";
 }
 
 Selling* Selling::getInstance() {

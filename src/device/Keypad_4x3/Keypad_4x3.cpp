@@ -60,9 +60,10 @@ Keypad_4x3::Keypad_4x3(char *userKeymap, byte *row, byte *col, byte numRows, byt
 
     //LED pin settings
     pcf8574.pinMode(P7, OUTPUT);
-    onLED();
 
     pcf8574.begin();
+    pinMode(3, OUTPUT);
+
     task_initialize();
 }
 
@@ -88,11 +89,11 @@ Keypad_4x3* Keypad_4x3::getInstance() {
 }
 
 void Keypad_4x3::onLED() {
-    pcf8574.digitalWrite(P7, LOW);
+    digitalWrite(3, LOW);
 }
 
 void Keypad_4x3::offLED() {
-    pcf8574.digitalWrite(P7, HIGH);
+    digitalWrite(3, HIGH);
 }
 
 void Keypad_4x3::subscribe(std::function<void(const char)> callback) {

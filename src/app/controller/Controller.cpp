@@ -112,7 +112,7 @@ int Controller::setupMachine() {
 }
 
 int Controller::setupKeypad() {
-    enum {KEYPAD_I2C_SCL = 5, KEYPAD_I2C_SDA = 4,};
+    enum {KEYPAD_I2C_SCL = 5, KEYPAD_I2C_SDA = 4, KEYPAD_LED = 3};
     auto onKeypadCallback = [&](const char key) {
         putMessage(MessageKeypadPress, key);
     };

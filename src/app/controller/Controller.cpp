@@ -56,14 +56,16 @@ void Controller::putMessage(MessageType type, int data, int delay_ms) {
 static int channel_swMotorInterrupt;
 static void motorRoundCallback(Controller* p) {
     p->_isISR = true;
-    p->putMessage(MessageRelayClose, channel_swMotorInterrupt);
+    if (digitalRead(2) == LOW) {
+        p->putMessage(MessageRelayClose, channel_swMotorInterrupt);
+    }
     p->_isISR = false;
 }
 
 int Controller::setupMachine() {
     _machine = FlowVendingMachine::getInstance();
-    // pinMode(2, INPUT_PULLUP);
-    // attachInterrupt(2, motorRoundCallback, FALLING, this);
+    pinMode(2, INPUT);
+    attachInterrupt(2, motorRoundCallback, FALLING, this);
 
     auto onChangedCallback = [&](std::unordered_map<std::string, std::string> data) {
         Serial.printf("%s\r\n", data["state"].c_str());
@@ -84,7 +86,7 @@ int Controller::setupMachine() {
         } else if(data["LockerType"] == "2") { // relay (mortor)
             channel_swMotorInterrupt = std::stoi(data["LockerChannel"]);
             putMessage(MessageRelayOpen, channel_swMotorInterrupt);
-            putMessage(MessageRelayClose, channel_swMotorInterrupt, 6300);
+            putMessage(MessageRelayClose, channel_swMotorInterrupt, 8000);
             // The motorRoundCallback must be called after above code is working
         }
 
@@ -129,11 +131,11 @@ int Controller::setupBankNoteReader() {
     int readerMode = _machine->_database->getBanknoteReaderMode();
 
     if (readerMode == 1) {
+        _bankNoteReader = OBH_K03P::getInstance()->setPins(12, 10, 11);
+    } else if(readerMode == 2) {
         Serial2.setPinout(8, 9);
         Serial2.begin(9600);
         _bankNoteReader = OBH_K03S::getInstance(Serial2);
-    } else if(readerMode == 2) {
-        _bankNoteReader = OBH_K03P::getInstance()->setPins(12, 10, 11);
     } else {
         Serial.println("Reader Mode setting error");
         return -1;
@@ -193,6 +195,7 @@ void Controller::setup() {
     }
     delay(1000);
 
+    pinMode(22, OUTPUT);
     //total setup time is 5sec for easy firmware update when running binary is dead right now after started
 }
 
@@ -204,9 +207,11 @@ void Controller::loop() {
 }
 
 void Controller::processModel(Message &Message) {
+    static PinStatus running_led = HIGH;
     switch(Message.type) {
     case MessageInitial:
         _machine->begin(_isInitOk);
+        putMessage(MessageRunning, 0);
         break;
     case MessageKeypadPress:
         _machine->pressKey(Message.data);
@@ -220,7 +225,14 @@ void Controller::processModel(Message &Message) {
     case MessageTimeout:
         _machine->timeout(Message.data);
         break;
-    case MessageTEST:
+    case MessageRunning:
+        digitalWrite(22, running_led);
+        if (running_led == LOW) {
+            running_led = HIGH;
+        } else {
+            running_led = LOW;
+        }
+        putMessage(MessageRunning, 0, 250);
         break;
     }
 }

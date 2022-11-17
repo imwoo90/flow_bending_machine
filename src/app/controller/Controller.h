@@ -21,6 +21,7 @@ typedef enum {
     MessageBanknoteReaderDisable,
     MessageRelayOpen,
     MessageRelayClose,
+    MessageRunning,
     MessageTEST,
 } MessageType;
 

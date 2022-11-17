@@ -37,13 +37,16 @@ MachineState* MotorTypeSetting::pressKey(const char key) {
             int start = std::stoi(_data["param_0"]);
             int end = std::stoi(_data["param_1"]);
             int motorType = std::stoi(_data["param_2"]);
-            if ( start == 0 || end == 0 )
+            if ( start <= 0)
+                break;
+            else if (end < start)
+                break;
+            else if (_database->getNumberOfColumns() < end)
                 break;
 
             for(int i = start; i <= end; i++) {
                 // relay index is i-1 (started zero index)
                 _database->setMotorType(i-1, motorType);
-
             }
         }
         break;

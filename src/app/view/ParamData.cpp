@@ -43,6 +43,8 @@ const ParamData EnterPasswordOfVendingMachineModeSetting_ParamDatas[] = {
 const ParamData EnterProductNumber_ParamDatas[] = {
     {.interval = 40, .x = 80, .y = 95, .font = u8g2_font_logisoso32_tr,},
 };
+const ParamData EnterProductNumberNoGoods_ParamDatas[] = {
+};
 const ParamData InputMoney_0_ParamDatas[] = {
 };
 const ParamData InputMoney_1_ParamDatas[] = {

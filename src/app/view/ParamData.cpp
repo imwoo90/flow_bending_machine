@@ -32,7 +32,7 @@ const ParamData EnterPasswordOfPasswordChange_ParamDatas[] = {
     {.interval = 21, .x = 70, .y = 110, .font = u8g2_font_logisoso16_tr,},
 };
 const ParamData EnterPasswordOfSystemManagement_ParamDatas[] = {
-    {.interval = 21, .x = 50, .y = 110, .font = u8g2_font_logisoso16_tr,},
+    {.interval = 21, .x = 102, .y = 110, .font = u8g2_font_logisoso16_tr,},
 };
 const ParamData EnterPasswordOfSystemSetting_ParamDatas[] = {
     {.interval = 21, .x = 90, .y = 110, .font = u8g2_font_logisoso16_tr,},
@@ -153,13 +153,13 @@ const ParamData NumberOfRelaySetting_ParamDatas[] = {
     {.interval = 21, .x = 70, .y = 125, .font = u8g2_font_logisoso16_tr,},
 };
 const ParamData PasswordChange_ParamDatas[] = {
-    {.interval = 8, .x = 170, .y = 35, .font = u8g2_font_logisoso16_tr,},
-    {.interval = 8, .x = 170, .y = 55, .font = u8g2_font_logisoso16_tr,},
-    {.interval = 8, .x = 170, .y = 75, .font = u8g2_font_logisoso16_tr,},
-    {.interval = 8, .x = 170, .y = 95, .font = u8g2_font_logisoso16_tr,},
-    {.interval = 8, .x = 170, .y = 115, .font = u8g2_font_logisoso16_tr,},
-    {.interval = 8, .x = 170, .y = 135, .font = u8g2_font_logisoso16_tr,},
-    {.interval = 8, .x = 170, .y = 155, .font = u8g2_font_logisoso16_tr,},
+    {.interval = 10, .x = 165, .y = 38, .font = u8g2_font_logisoso16_tr,},
+    {.interval = 10, .x = 165, .y = 58, .font = u8g2_font_logisoso16_tr,},
+    {.interval = 10, .x = 165, .y = 77, .font = u8g2_font_logisoso16_tr,},
+    {.interval = 10, .x = 165, .y = 96, .font = u8g2_font_logisoso16_tr,},
+    {.interval = 10, .x = 165, .y = 115, .font = u8g2_font_logisoso16_tr,},
+    {.interval = 10, .x = 165, .y = 135, .font = u8g2_font_logisoso16_tr,},
+    {.interval = 10, .x = 165, .y = 155, .font = u8g2_font_logisoso16_tr,},
 };
 const ParamData SalesInfo_ParamDatas[] = {
     {.interval = -9, .x = 210, .y = 55, .font = u8g2_font_logisoso16_tr,},

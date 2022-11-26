@@ -29,12 +29,12 @@ MachineState* MatchingChannelAndColumn::pressKey(const char key) {
             _selection = 1;
         } else {
             _selection = 0;
-            int column = std::stoi(_data["param_0"]);
-            int channel = std::stoi(_data["param_1"]);
+            int column = std::stoi(_data["param_0"])-1;
+            int channel = std::stoi(_data["param_1"])-1;
             int maxCol = _database->getNumberOfColumns();
 
             //out of range
-            if( !(0 < column && column <= maxCol) || !(0 < channel && channel <= maxCol))
+            if( !(0 <= column && column < maxCol) || !(0 <= channel && channel < maxCol))
                 break;
 
             _database->setChannel(column, channel);

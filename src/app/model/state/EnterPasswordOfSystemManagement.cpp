@@ -26,7 +26,8 @@ void EnterPasswordOfSystemManagement::initialize() {
     _data["state"] = "EnterPasswordOfSystemManagement";
     if (_isChangePasswords) {
         char buf[32];
-        _data["param_0"] = itoa(_database->getPasswordOfSystemManagement(), buf, 10);
+        sprintf(buf, "%03d", _database->getPasswordOfSystemManagement());
+        _data["param_0"] = buf;
     } else {
         _data["param_0"] = "000";
     }

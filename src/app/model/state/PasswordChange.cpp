@@ -12,16 +12,22 @@
 
 void PasswordChange::initialize() {
     char buf[32];
+    auto _itoa = [](char* _buf, int n, int d) {
+        char format[10] = "%00d";
+        format[2] += n;
+        sprintf(_buf, format, d);
+        return _buf;
+    };
     // init data
     _data.clear();
     _data["state"] = "PasswordChange";
-    _data["param_0"] = itoa(_database->getPasswordOfSystemManagement(), buf, 10);
-    _data["param_1"] = itoa(_database->getPasswordOfSystemSetting(), buf, 10);
-    _data["param_2"] = itoa(_database->getPasswordOfVendingMachineModeSetting(), buf, 10);
-    _data["param_3"] = itoa(_database->getPasswordOfMainManagement(), buf, 10);
-    _data["param_4"] = itoa(_database->getPasswordOfAdditionalStock(), buf, 10);
-    _data["param_5"] = itoa(_database->getPasswordOfManualSales(), buf, 10);
-    _data["param_6"] = itoa(_database->getPasswordOfPasswordChange(), buf, 10);
+    _data["param_0"] = _itoa(buf, 3,  _database->getPasswordOfSystemManagement());
+    _data["param_1"] = _itoa(buf, 4, _database->getPasswordOfSystemSetting());
+    _data["param_2"] = _itoa(buf, 8, _database->getPasswordOfVendingMachineModeSetting());
+    _data["param_3"] = _itoa(buf, 6, _database->getPasswordOfMainManagement());
+    _data["param_4"] = _itoa(buf, 6, _database->getPasswordOfAdditionalStock());
+    _data["param_5"] = _itoa(buf, 6, _database->getPasswordOfManualSales());
+    _data["param_6"] = _itoa(buf, 6, _database->getPasswordOfPasswordChange());
 }
 
 PasswordChange* PasswordChange::getInstance() {

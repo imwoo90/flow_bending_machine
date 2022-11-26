@@ -18,7 +18,7 @@ MachineState* EnterPasswordOfVendingMachineModeSetting::decide(int password) {
 
 MachineState* EnterPasswordOfVendingMachineModeSetting::cancel() {
     if (_isChangePasswords) {
-        return this;
+        return PasswordChange::getInstance();
     }
     return SystemSetting::getInstance();
 }
@@ -29,7 +29,8 @@ void EnterPasswordOfVendingMachineModeSetting::initialize() {
     _data["state"] = "EnterPasswordOfVendingMachineModeSetting";
     if (_isChangePasswords) {
         char buf[32];
-        _data["param_0"] = itoa(_database->getPasswordOfVendingMachineModeSetting(), buf, 10);
+        sprintf(buf, "%08d", _database->getPasswordOfVendingMachineModeSetting());
+        _data["param_0"] = buf;
     } else {
         _data["param_0"] = "00000000";
     }

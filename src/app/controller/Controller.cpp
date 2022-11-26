@@ -195,7 +195,7 @@ void Controller::setup() {
     }
     delay(1000);
 
-    pinMode(22, OUTPUT);
+    pinMode(22, OUTPUT); //running ld pin number is 22
     //total setup time is 5sec for easy firmware update when running binary is dead right now after started
 }
 

@@ -13,7 +13,7 @@ EnterProductNumberNoGoods::EnterProductNumberNoGoods() {
         "EnterProductNumberNoGoods",
         /* The timer period in ticks, must be
         greater than 0. */
-        pdMS_TO_TICKS(1*1000),
+        pdMS_TO_TICKS(2*1000),
         /* The timers will auto-reload themselves
         when they expire. */
         pdFALSE,

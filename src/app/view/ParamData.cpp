@@ -46,10 +46,11 @@ const ParamData EnterProductNumber_ParamDatas[] = {
 const ParamData EnterProductNumberNoGoods_ParamDatas[] = {
 };
 const ParamData InputMoney_0_ParamDatas[] = {
+    {.interval = -34, .x = 180, .y = 95, .font = u8g2_font_logisoso32_tr,},
 };
 const ParamData InputMoney_1_ParamDatas[] = {
-    {.interval = 18, .x = 120, .y = 80, .font = u8g2_font_logisoso16_tr,},
-    {.interval = 18, .x = 120, .y = 105, .font = u8g2_font_logisoso16_tr,},
+    {.interval = -16, .x = 200, .y = 80, .font = u8g2_font_logisoso16_tr,},
+    {.interval = -16, .x = 200, .y = 105, .font = u8g2_font_logisoso16_tr,},
 };
 const ParamData ListOfAdditionalStock_ParamDatas[] = {
     // Left 4

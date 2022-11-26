@@ -34,6 +34,7 @@ void InputMoney::initialize() {
     // init data
     _data.clear();
     _data["state"] = "InputMoney_0";
+    _data["param_0"] = itoa(_database->getPrice(_column), buf, 10);
     _data["BanknoteReader"] = "enable";
     xTimerChangePeriod(_timer, 30*1000, 0);
     //key timout start

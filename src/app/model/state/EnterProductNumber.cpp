@@ -2,6 +2,7 @@
 #include "Selling.h"
 #include "EnterPasswordOfSystemSetting.h"
 #include "InputMoney.h"
+#include "EnterProductNumberNoGoods.h"
 
 static void keyTimeoutCallBack( TimerHandle_t xTimer ) {
     MachineState::_timeoutCallback(TimeoutEnterProductNumber);
@@ -62,8 +63,10 @@ MachineState* EnterProductNumber::pressKey(const char key) {
                 next =InputMoney::getInstance(n);
                 break;
             }
+        } else {
+            next = EnterProductNumberNoGoods::getInstance();
+            break;
         }
-        xTimerStart(_timer, 0);
         break;}
     case '*': {
         next = Selling::getInstance();

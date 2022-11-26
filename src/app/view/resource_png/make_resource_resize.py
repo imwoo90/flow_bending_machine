@@ -13,6 +13,7 @@ list_name = [
     'Selling.png',
     'StopSelling.png',
     'EnterProductNumber.png',
+    'EnterProductNumberNoGoods.png',
     'InputMoney_0.png',
     'InputMoney_1.png',
     'SystemSetting.png',
@@ -49,6 +50,7 @@ for f_png in natsort.natsorted(os.listdir(resource_path)):
         change_name = list_name[idx]
         src = os.path.join(resource_path, f_png)
         dst = os.path.join(resource_path, change_name)
+        print(f'{f_png}  {change_name}')
         os.rename(src, dst)
         idx += 1
 

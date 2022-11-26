@@ -11,6 +11,7 @@ list_name = [
     'Selling',
     'StopSelling',
     'EnterProductNumber',
+    'EnterProductNumberNoGoods',
     'InputMoney_0',
     'InputMoney_1',
     'SystemSetting',

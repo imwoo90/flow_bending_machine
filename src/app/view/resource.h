@@ -14,6 +14,7 @@
     X(EnterPasswordOfSystemSetting)\
     X(EnterPasswordOfVendingMachineModeSetting)\
     X(EnterProductNumber)\
+    X(EnterProductNumberNoGoods)\
     X(InputMoney_0)\
     X(InputMoney_1)\
     X(ListOfAdditionalStock)\

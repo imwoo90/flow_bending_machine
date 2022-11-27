@@ -12,7 +12,8 @@ typedef enum {
     TimeoutEnterProductNumber,
     TimeoutEnterProductNumberNoGoods,
     TimeoutInputMoney,
-    TimeoutDeleteList
+    TimeoutDeleteList,
+    TimeoutDeleteSalesInfo,
 } KindOfTimeout;
 
 class MachineState {

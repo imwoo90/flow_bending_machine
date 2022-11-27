@@ -29,25 +29,46 @@ MachineState* MotorTypeSetting::pressKey(const char key) {
         break;
     case '#':
         if ( _selection == 0) {
+            int start = std::stoi(_data["param_0"]);
+            if (start <= 0) {
+                break;
+            } else if(_database->getNumberOfRelays() < start) {
+                break;
+            }
             _selection = 1;
         } else if ( _selection == 1) {
+            int start = std::stoi(_data["param_0"]);
+            int end = std::stoi(_data["param_1"]);
+            if (end < start) {
+                break;
+            } else if(_database->getNumberOfRelays() < end) {
+                break;
+            }
             _selection = 2;
         } else if ( _selection == 2) {
-            _selection = 0;
             int start = std::stoi(_data["param_0"]);
             int end = std::stoi(_data["param_1"]);
             int motorType = std::stoi(_data["param_2"]);
-            if ( start <= 0)
+            if (!(0 < motorType && motorType <= 2)) {
                 break;
-            else if (end < start)
-                break;
-            else if (_database->getNumberOfColumns() < end)
-                break;
-
-            for(int i = start; i <= end; i++) {
-                // relay index is i-1 (started zero index)
-                _database->setMotorType(i-1, motorType);
             }
+
+            // Get start and end channel
+            int ch_start = 0;
+            int ch_end = 0;
+            for(int relayIdx = 0; relayIdx < end; relayIdx++) {
+                int n = _database->getNumberOfChannels(relayIdx);
+                ch_end += n;
+                if (relayIdx < (start-1)) {
+                    ch_start += n;
+                }
+            }
+
+            //set channel in selected relay
+            for(int ch = ch_start; ch < ch_end; ch++) {
+                _database->setMotorType(ch, motorType);
+            }
+            _selection = 0;
         }
         break;
     default: {//1~9

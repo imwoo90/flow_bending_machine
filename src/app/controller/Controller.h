@@ -9,6 +9,7 @@
 
 #include <FreeRTOS.h>
 #include <queue.h>
+#include <timers.h>
 
 typedef enum {
     MessageInitial,
@@ -34,6 +35,7 @@ class Controller {
 private:
     int _isInitOk = true;
     QueueHandle_t _q;
+    TimerHandle_t _keypadOffLedTimer;
 
     Display* _display;
 

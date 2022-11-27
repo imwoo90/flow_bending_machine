@@ -33,7 +33,7 @@ void Controller::putMessage(MessageType type, int data, int delay_ms) {
             "putMessage",
             /* The timer period in ticks, must be
             greater than 0. */
-            delay_ms / portTICK_PERIOD_MS,
+            pdMS_TO_TICKS(delay_ms),
             /* The timers will auto-reload themselves
             when they expire. */
             pdFALSE,
@@ -111,6 +111,10 @@ int Controller::setupMachine() {
     return 0;
 }
 
+static void _keypadOffLED( TimerHandle_t xTimer ) {
+    Keypad_4x3* _keypad = (Keypad_4x3*)pvTimerGetTimerID(xTimer);
+    _keypad->offLED();
+}
 int Controller::setupKeypad() {
     enum {KEYPAD_I2C_SCL = 5, KEYPAD_I2C_SDA = 4, KEYPAD_LED = 3};
     auto onKeypadCallback = [&](const KeyState state, const char key) {
@@ -128,6 +132,27 @@ int Controller::setupKeypad() {
     Wire.setSDA(KEYPAD_I2C_SDA);
     _keypad = Keypad_4x3::getInstance();
     _keypad->subscribe(onKeypadCallback);
+    _keypad->offLED();
+
+    //create keypad off led timer
+    _keypadOffLedTimer = xTimerCreate
+    ( /* Just a text name, not used by the RTOS
+        kernel. */
+        "keypadOffLed",
+        /* The timer period in ticks, must be
+        greater than 0. */
+        pdMS_TO_TICKS(2*1000),
+        /* The timers will auto-reload themselves
+        when they expire. */
+        pdFALSE,
+        /* The ID is used to store a count of the
+        number of times the timer has expired, which
+        is initialised to 0. */
+        _keypad,
+        /* Each timer calls the same callback when
+        it expires. */
+        _keypadOffLED
+    );
     return 0;
 }
 
@@ -214,7 +239,6 @@ void Controller::loop() {
 }
 
 void Controller::processModel(Message &Message) {
-    static PinStatus running_led = HIGH;
     switch(Message.type) {
     case MessageInitial:
         _machine->begin(_isInitOk);
@@ -222,15 +246,31 @@ void Controller::processModel(Message &Message) {
         break;
     case MessageKeypadPress:
         _machine->pressKey(Message.data);
+        _keypad->onLED();
+        if ( xTimerIsTimerActive(_keypadOffLedTimer))
+            xTimerStop(_keypadOffLedTimer, 0);
         break;
     case MessageKeypadRelease:
         _machine->releaseKey(Message.data);
+        xTimerStart(_keypadOffLedTimer, 0);
         break;
     case MessageBanknoteRecognize:
         _machine->recognizeBanknote(Message.data);
         break;
     case MessageTimeout:
         _machine->timeout(Message.data);
+        break;
+    }
+}
+
+void Controller::operateDevice(Message &Message) {
+    static PinStatus running_led = HIGH;
+    switch(Message.type) {
+    case MessageBanknoteReaderEnable:
+        _bankNoteReader->enable();
+        break;
+    case MessageBanknoteReaderDisable:
+        _bankNoteReader->disable();
         break;
     case MessageRunning:
         digitalWrite(22, running_led);
@@ -240,17 +280,6 @@ void Controller::processModel(Message &Message) {
             running_led = LOW;
         }
         putMessage(MessageRunning, 0, 250);
-        break;
-    }
-}
-
-void Controller::operateDevice(Message &Message) {
-    switch(Message.type) {
-    case MessageBanknoteReaderEnable:
-        _bankNoteReader->enable();
-        break;
-    case MessageBanknoteReaderDisable:
-        _bankNoteReader->disable();
         break;
     case MessageRelayOpen:{
         int channel = Message.data;

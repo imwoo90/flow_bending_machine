@@ -113,8 +113,15 @@ int Controller::setupMachine() {
 
 int Controller::setupKeypad() {
     enum {KEYPAD_I2C_SCL = 5, KEYPAD_I2C_SDA = 4, KEYPAD_LED = 3};
-    auto onKeypadCallback = [&](const char key) {
-        putMessage(MessageKeypadPress, key);
+    auto onKeypadCallback = [&](const KeyState state, const char key) {
+        switch(state) {
+        case PRESSED:
+            putMessage(MessageKeypadPress, key);
+            break;
+        case RELEASED:
+            putMessage(MessageKeypadRelease, key);
+            break;
+        }
     };
     Wire.setClock(400000);
     Wire.setSCL(KEYPAD_I2C_SCL);

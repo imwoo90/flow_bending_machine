@@ -17,7 +17,7 @@ public:
     static Keypad_4x3* getInstance();
     void onLED();
     void offLED();
-    void subscribe(std::function<void(const char)> callback);
+    void subscribe(std::function<void(const KeyState, const char)> callback);
 };
 
 

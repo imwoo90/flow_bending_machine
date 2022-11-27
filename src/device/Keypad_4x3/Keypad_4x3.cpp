@@ -4,7 +4,23 @@
 #include <FreeRTOS.h>
 #include <task.h>
 
-static std::vector<std::function<void(const char)> > _callbacks;
+static std::vector<std::function<void(const KeyState, const char)> > _callbacks;
+
+static void keypadEvent(KeypadEvent key){
+    Keypad_4x3* kp = Keypad_4x3::getInstance();
+    for (auto i = 0; i < _callbacks.size(); i++) {
+        _callbacks[i](kp->getState(), key);
+    }
+}
+
+static void scan_task(void *params) {
+    Keypad_4x3* kp = Keypad_4x3::getInstance();
+    kp->addEventListener(keypadEvent);
+    while(1) {
+        kp->getKey();
+        delay(50);
+    }
+}
 
 void Keypad_4x3::pin_mode(byte pinNum, byte mode) {
     // pcf8574.pinMode(pinNum, mode);
@@ -15,29 +31,6 @@ void Keypad_4x3::pin_write(byte pinNum, boolean level) {
 int  Keypad_4x3::pin_read(byte pinNum) {
     int read = pcf8574.digitalRead(pinNum, true);
     return read;
-}
-
-static void notify() {
-    Keypad_4x3* kp = Keypad_4x3::getInstance();
-    char key = kp->getKey();
-    if (key == NO_KEY)
-        return;
-
-    // if (key == 27) // esc
-    //     key = '*';
-    // else if (key == 9) // tab
-    //     key = '#';
-
-    for (auto i = 0; i < _callbacks.size(); i++) {
-        _callbacks[i](key);
-    }
-}
-
-static void scan_task(void *params) {
-    while(1) {
-        notify();
-        delay(50);
-    }
 }
 
 static void task_initialize() {
@@ -96,6 +89,6 @@ void Keypad_4x3::offLED() {
     digitalWrite(3, HIGH);
 }
 
-void Keypad_4x3::subscribe(std::function<void(const char)> callback) {
+void Keypad_4x3::subscribe(std::function<void(const KeyState, const char)> callback) {
     _callbacks.push_back(callback);
 }

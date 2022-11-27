@@ -4,6 +4,31 @@
 
 #define NUMBER_PER_PAGE 8
 
+static void deleteListTimeoutCallBack( TimerHandle_t xTimer ) {
+    MachineState::_timeoutCallback(TimeoutDeleteList);
+}
+
+ListOfAdditionalStock::ListOfAdditionalStock() {
+    _timer = xTimerCreate(
+         /* Just a text name, not used by the RTOS
+        kernel. */
+        "ListOfAdditionalStock",
+        /* The timer period in ticks, must be
+        greater than 0. */
+        pdMS_TO_TICKS(5*1000),
+        /* The timers will auto-reload themselves
+        when they expire. */
+        pdFALSE,
+        /* The ID is used to store a count of the
+        number of times the timer has expired, which
+        is initialised to 0. */
+        ( void * ) 0,
+        /* Each timer calls the same callback when
+        it expires. */
+        deleteListTimeoutCallBack
+    );
+}
+
 void ListOfAdditionalStock::initialize() {
     // init data
     _data.clear();
@@ -18,8 +43,33 @@ ListOfAdditionalStock* ListOfAdditionalStock::getInstance() {
     return &singleton_instance;
 }
 
+MachineState* ListOfAdditionalStock::timeout(const int signal) {
+    for (int column = 0; column < _database->getNumberOfColumns(); column++)
+        _database->setAdditional(column, 0);
+    loadListOfAdditionalStock();
+
+    return this;
+}
+
+MachineState* ListOfAdditionalStock::releaseKey(const char key) {
+    MachineState* next = this;
+
+    switch ( key ) {
+    case '#':
+        _isDisablePresskey = false;
+        if ( xTimerIsTimerActive(_timer) == pdFALSE )
+            break;
+        xTimerStop(_timer, 0);
+        break;
+    }
+    return next;
+}
+
 MachineState* ListOfAdditionalStock::pressKey(const char key) {
     MachineState* next = this;
+    if (_isDisablePresskey)
+        return next;
+
     switch ( key ) {
     case '1':
         if (_page == 0)
@@ -37,11 +87,8 @@ MachineState* ListOfAdditionalStock::pressKey(const char key) {
         loadListOfAdditionalStock();
         break;
     case '#':
-        //5초간 눌렀을때 초기화 구현 해야함
-        for (int column = 0; column < _database->getNumberOfColumns(); column++)
-            _database->setAdditional(column, 0);
-
-        loadListOfAdditionalStock();
+        _isDisablePresskey = true;
+        xTimerStart(_timer, 0);
         break;
     case '*':
         next = MainManagement::getInstance();

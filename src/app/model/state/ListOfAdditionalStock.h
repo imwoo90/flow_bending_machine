@@ -20,6 +20,6 @@ public:
     static ListOfAdditionalStock* getInstance();
 
     virtual MachineState* timeout(const int signal);
-    virtual MachineState* ListOfAdditionalStock::releaseKey(const char key);
+    virtual MachineState* releaseKey(const char key);
     virtual MachineState* pressKey(const char key);
 };

@@ -19,6 +19,7 @@
     X(InputMoney_1)\
     X(ListOfAdditionalStock)\
     X(ListOfColumnData)\
+    X(ListOfCurrentStock)\
     X(MainManagement)\
     X(ManualSales)\
     X(MatchingChannelAndColumn)\

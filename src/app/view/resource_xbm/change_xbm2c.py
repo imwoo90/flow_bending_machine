@@ -37,6 +37,7 @@ list_name = [
     'ColumnTestManul',
     'ColumnTestSection',
     'ColumnTestAll',
+    'ListOfCurrentStock.png',
     'ListOfAdditionalStock',
     'AdditionalStock',
     'ManualSales',

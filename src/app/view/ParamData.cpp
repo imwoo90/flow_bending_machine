@@ -128,6 +128,44 @@ const ParamData ListOfColumnData_ParamDatas[] = {
     //page
     {.interval = 10, .x = 218, .y = 157, .font = u8g2_font_logisoso16_tr,},
 };
+const ParamData ListOfCurrentStock_ParamDatas[] = {
+    // Left 4
+    {.interval = 10, .x = 6, .y = 65, .font = u8g2_font_logisoso16_tr,},
+    {.interval = 10, .x = 48, .y = 65, .font = u8g2_font_logisoso16_tr,},
+    {.interval = 10, .x = 90, .y = 65, .font = u8g2_font_logisoso16_tr,},
+
+    {.interval = 10, .x = 6, .y = 88, .font = u8g2_font_logisoso16_tr,},
+    {.interval = 10, .x = 48, .y = 88, .font = u8g2_font_logisoso16_tr,},
+    {.interval = 10, .x = 90, .y = 88, .font = u8g2_font_logisoso16_tr,},
+
+    {.interval = 10, .x = 6, .y = 111, .font = u8g2_font_logisoso16_tr,},
+    {.interval = 10, .x = 48, .y = 111, .font = u8g2_font_logisoso16_tr,},
+    {.interval = 10, .x = 90, .y = 111, .font = u8g2_font_logisoso16_tr,},
+
+    {.interval = 10, .x = 6, .y = 134, .font = u8g2_font_logisoso16_tr,},
+    {.interval = 10, .x = 48, .y = 134, .font = u8g2_font_logisoso16_tr,},
+    {.interval = 10, .x = 90, .y = 134, .font = u8g2_font_logisoso16_tr,},
+
+    // Right 4
+    {.interval = 10, .x = 134, .y = 65, .font = u8g2_font_logisoso16_tr,},
+    {.interval = 10, .x = 176, .y = 65, .font = u8g2_font_logisoso16_tr,},
+    {.interval = 10, .x = 218, .y = 65, .font = u8g2_font_logisoso16_tr,},
+
+    {.interval = 10, .x = 134, .y = 88, .font = u8g2_font_logisoso16_tr,},
+    {.interval = 10, .x = 176, .y = 88, .font = u8g2_font_logisoso16_tr,},
+    {.interval = 10, .x = 218, .y = 88, .font = u8g2_font_logisoso16_tr,},
+
+    {.interval = 10, .x = 134, .y = 111, .font = u8g2_font_logisoso16_tr,},
+    {.interval = 10, .x = 176, .y = 111, .font = u8g2_font_logisoso16_tr,},
+    {.interval = 10, .x = 218, .y = 111, .font = u8g2_font_logisoso16_tr,},
+
+    {.interval = 10, .x = 134, .y = 134, .font = u8g2_font_logisoso16_tr,},
+    {.interval = 10, .x = 176, .y = 134, .font = u8g2_font_logisoso16_tr,},
+    {.interval = 10, .x = 218, .y = 134, .font = u8g2_font_logisoso16_tr,},
+
+    //page
+    {.interval = 10, .x = 218, .y = 157, .font = u8g2_font_logisoso16_tr,},
+};
 const ParamData MainManagement_ParamDatas[] = {
 };
 const ParamData ManualSales_ParamDatas[] = {

@@ -39,6 +39,7 @@ list_name = [
     'ColumnTestManul.png',
     'ColumnTestSection.png',
     'ColumnTestAll.png',
+    'ListOfCurrentStock.png',
     'ListOfAdditionalStock.png',
     'AdditionalStock.png',
     'ManualSales.png',

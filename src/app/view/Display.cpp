@@ -69,7 +69,7 @@ void Display::drawParamDatas(ResourceType bg, std::unordered_map<std::string, st
         }
 
         auto selection = data.find("selection");
-        if (selection != data.end() && selection->second != param){
+        if (selection != data.end() && selection->second == param){
             cursorWidth = abs(x-paramDatas[i].x) + charWidth;
             u8g2.drawBox(cursorX, paramDatas[i].y-charHeight, cursorWidth, charHeight+1);
         }

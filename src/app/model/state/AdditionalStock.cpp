@@ -11,6 +11,7 @@ void AdditionalStock::initialize() {
     _data["param_1"] = "000000";
     _data["param_2"] = "00"; // number of goods
     _selection = 0;
+    _data["selection"] = "param_0";
 }
 
 AdditionalStock* AdditionalStock::getInstance() {
@@ -37,6 +38,7 @@ MachineState* AdditionalStock::pressKey(const char key) {
 
                 _data["param_1"] = itoa(price, buf, 10);
                 _selection = 2;
+                _data["selection"] = "param_2";
             }
         } else if (_selection == 2) {
             column = std::stoi(_data["param_0"])-1;
@@ -44,6 +46,7 @@ MachineState* AdditionalStock::pressKey(const char key) {
             addGoods += _database->getAdditional(column);
             _database->setAdditional(column, addGoods);
             _selection = 0;
+            _data["selection"] = "param_0";
         }
         break;
     default: {//1~9
@@ -52,6 +55,7 @@ MachineState* AdditionalStock::pressKey(const char key) {
         std::string &param_0 = _data[param];
         rotate(param_0.begin(), param_0.begin()+1, param_0.end());
         param_0[param_0.length()-1] = key;
+        _data["selection"] = param;
         break;}
     }
     return next;

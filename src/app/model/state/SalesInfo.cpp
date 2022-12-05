@@ -13,7 +13,7 @@ SalesInfo::SalesInfo() {
         "SalesInfo",
         /* The timer period in ticks, must be
         greater than 0. */
-        pdMS_TO_TICKS(3*1000),
+        pdMS_TO_TICKS(5*1000),
         /* The timers will auto-reload themselves
         when they expire. */
         pdFALSE,

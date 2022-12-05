@@ -4,6 +4,7 @@
 #include "SalesInfo.h"
 #include "SetGoods.h"
 #include "WorkingTest.h"
+#include "ListOfCurrentStock.h"
 #include "ListOfAdditionalStock.h"
 
 void MainManagement::initialize() {
@@ -34,6 +35,9 @@ MachineState* MainManagement::pressKey(const char key) {
         next = WorkingTest::getInstance();
         break;
     case '4':
+         next = ListOfCurrentStock::getInstance();
+        break;
+    case '5':
          next = ListOfAdditionalStock::getInstance();
         break;
     }

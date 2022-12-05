@@ -47,6 +47,7 @@ MachineState* SetGoods::pressKey(const char key) {
             int quantity = std::stoi(_data["param_2"]);
             _database->setQuantity(column, quantity);
             _database->setPrice(column, std::stoi(_data["param_1"]));
+            _database->setAdditional(column, 0);
             Serial.printf("%d \n\r", _database->getQuantity(column));
             Serial.printf("%d \n\r", _database->getPrice(column));
             _selection = 0;

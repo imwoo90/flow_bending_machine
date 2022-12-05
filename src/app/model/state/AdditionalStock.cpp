@@ -45,6 +45,7 @@ MachineState* AdditionalStock::pressKey(const char key) {
             addGoods = std::stoi(_data["param_2"]);
             addGoods += _database->getAdditional(column);
             _database->setAdditional(column, addGoods);
+            _database->setQuantity(column, addGoods+_database->getQuantity(column));
             _selection = 0;
             _data["selection"] = "param_0";
         }

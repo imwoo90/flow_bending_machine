@@ -9,6 +9,7 @@ void MatchingChannelAndColumn::initialize() {
     _data["param_0"] = "000"; // 001 column
     _data["param_1"] = "000";
     _selection = 0;
+    _data["selection"] = "param_0";
 }
 
 MatchingChannelAndColumn* MatchingChannelAndColumn::getInstance() {
@@ -18,7 +19,7 @@ MatchingChannelAndColumn* MatchingChannelAndColumn::getInstance() {
 }
 
 MachineState* MatchingChannelAndColumn::pressKey(const char key) {
-    int column, channel;
+    static int column, channel;
     MachineState* next = this;
     switch ( key ) {
     case '*':
@@ -26,17 +27,22 @@ MachineState* MatchingChannelAndColumn::pressKey(const char key) {
         break;
     case '#':
         if (_selection == 0) {
-            _selection = 1;
-        } else {
-            _selection = 0;
-            int column = std::stoi(_data["param_0"])-1;
-            int channel = std::stoi(_data["param_1"])-1;
-            int maxCol = _database->getNumberOfColumns();
-
-            //out of range
-            if( !(0 <= column && column < maxCol) || !(0 <= channel && channel < maxCol))
+            column = std::stoi(_data["param_0"])-1;
+            if( !(0 <= column && column < _database->getNumberOfColumns()) ) {
                 break;
+            }
 
+            _selection = 1;
+            _data["selection"] = "param_1";
+        } else {
+            channel = std::stoi(_data["param_1"])-1;
+
+            if( !(0 <= channel && channel < _database->getNumberOfColumns()) ){
+                break;
+            }
+
+            _selection = 0;
+            _data["selection"] = "param_0";
             _database->setChannel(column, channel);
         }
         break;
@@ -46,6 +52,7 @@ MachineState* MatchingChannelAndColumn::pressKey(const char key) {
         std::string &param_0 = _data[param];
         rotate(param_0.begin(), param_0.begin()+1, param_0.end());
         param_0[param_0.length()-1] = key;
+        _data["selection"] = param;
         break;}
     }
     return next;

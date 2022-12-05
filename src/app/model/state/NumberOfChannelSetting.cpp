@@ -3,7 +3,6 @@
 #include "VendingMachineModeSetting.h"
 
 void NumberOfChannelSetting::initialize() {
-    char price[32];
     // init data
     _data.clear();
     _data["state"] = "NumberOfChannelSetting";
@@ -11,6 +10,7 @@ void NumberOfChannelSetting::initialize() {
     _data["param_1"] = "00";
     _data["param_2"] = "00";
     _selection = 0;
+    _data["selection"] = "param_0";
 }
 
 NumberOfChannelSetting* NumberOfChannelSetting::getInstance() {
@@ -20,8 +20,6 @@ NumberOfChannelSetting* NumberOfChannelSetting::getInstance() {
 }
 
 MachineState* NumberOfChannelSetting::pressKey(const char key) {
-    char price[32];
-    int column, numOfGoods;
     MachineState* next = this;
     switch ( key ) {
     case '*':
@@ -30,16 +28,19 @@ MachineState* NumberOfChannelSetting::pressKey(const char key) {
     case '#':
         if ( _selection == 0) {
             _selection = 1;
+            _data["selection"] = "param_1";
         } else if ( _selection == 1) {
             _selection = 2;
+            _data["selection"] = "param_2";
         } else if ( _selection == 2) {
-            _selection = 0;
             int start = std::stoi(_data["param_0"]);
             int end = std::stoi(_data["param_1"]);
             int numOfChannels = std::stoi(_data["param_2"]);
             if ( start == 0 || end == 0 )
                 break;
 
+            _selection = 0;
+            _data["selection"] = "param_0";
             for(int i = start; i <= end; i++) {
                 // relay index is i-1 (started zero index)
                 _database->setNumberOfChannels(i-1, numOfChannels);
@@ -52,6 +53,7 @@ MachineState* NumberOfChannelSetting::pressKey(const char key) {
         std::string &param_0 = _data[param];
         rotate(param_0.begin(), param_0.begin()+1, param_0.end());
         param_0[param_0.length()-1] = key;
+        _data["selection"] = param;
         break;}
     }
     return next;

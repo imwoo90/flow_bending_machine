@@ -11,6 +11,7 @@ void SetGoods::initialize() {
     _data["param_1"] = "000000";
     _data["param_2"] = "00";
     _selection = 0;
+    _data["selection"] = "param_0";
 }
 
 SetGoods* SetGoods::getInstance() {
@@ -32,12 +33,14 @@ MachineState* SetGoods::pressKey(const char key) {
             int column = std::stoi(_data["param_0"]) - 1;
             if (0 <= column && column < _database->getNumberOfColumns()) {
                 _selection = 1;
+                _data["selection"] = "param_1";
             }
         } else if ( _selection == 1) {
             int column = std::stoi(_data["param_0"]) - 1;
             int price = std::stoi(_data["param_1"]);
             if (price <= 500000) {
                 _selection = 2;
+                _data["selection"] = "param_2";
             }
         } else if ( _selection == 2) {
             int column = std::stoi(_data["param_0"]) - 1;
@@ -47,6 +50,7 @@ MachineState* SetGoods::pressKey(const char key) {
             Serial.printf("%d \n\r", _database->getQuantity(column));
             Serial.printf("%d \n\r", _database->getPrice(column));
             _selection = 0;
+            _data["selection"] = "param_0";
         }
         break;
     default: {//1~9
@@ -59,6 +63,7 @@ MachineState* SetGoods::pressKey(const char key) {
 
         rotate(param.begin(), param.begin()+1, param.begin() + size);
         param[size-1] = key;
+        _data["selection"] = param_idx;
         break;}
     }
     return next;

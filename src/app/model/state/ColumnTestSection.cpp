@@ -9,6 +9,7 @@ void ColumnTestSection::initialize() {
     _data["param_0"] = "000";
     _data["param_1"] = "000";
     _selection = 0;
+    _data["selection"] = "param_0";
 }
 
 ColumnTestSection* ColumnTestSection::getInstance() {
@@ -44,17 +45,19 @@ MachineState* ColumnTestSection::pressKey(const char key) {
             break;
 
         if (_selection == 0) {
-            _selection = 1;
-        } else if (_selection == 1) {
             column_s = std::stoi(_data["param_0"]) - 1;
-            column_e = std::stoi(_data["param_1"]) - 1;
             if (!(0 <= column_s && column_s < _database->getNumberOfColumns())) {
                 break;
             }
+            _selection = 1;
+            _data["selection"] = "param_1";
+        } else if (_selection == 1) {
+            column_e = std::stoi(_data["param_1"]) - 1;
             if (!(0 <= column_e && column_e < _database->getNumberOfColumns())) {
                 break;
             }
             _selection = 0;
+            _data["selection"] = "param_0";
             _data["keyEvent"] = "L";
             column = column_s;
             running_test = true;
@@ -73,6 +76,7 @@ MachineState* ColumnTestSection::pressKey(const char key) {
         std::string &param_0 = _data[param];
         rotate(param_0.begin(), param_0.begin()+1, param_0.end());
         param_0[param_0.length()-1] = key;
+        _data["selection"] = param;
         break;}
     }
     return next;

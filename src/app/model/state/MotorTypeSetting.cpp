@@ -11,6 +11,7 @@ void MotorTypeSetting::initialize() {
     _data["param_1"] = "00";
     _data["param_2"] = "00";
     _selection = 0;
+    _data["selection"] = "param_0";
 }
 
 MotorTypeSetting* MotorTypeSetting::getInstance() {
@@ -36,6 +37,7 @@ MachineState* MotorTypeSetting::pressKey(const char key) {
                 break;
             }
             _selection = 1;
+            _data["selection"] = "param_1";
         } else if ( _selection == 1) {
             int start = std::stoi(_data["param_0"]);
             int end = std::stoi(_data["param_1"]);
@@ -45,6 +47,7 @@ MachineState* MotorTypeSetting::pressKey(const char key) {
                 break;
             }
             _selection = 2;
+            _data["selection"] = "param_2";
         } else if ( _selection == 2) {
             int start = std::stoi(_data["param_0"]);
             int end = std::stoi(_data["param_1"]);
@@ -69,6 +72,7 @@ MachineState* MotorTypeSetting::pressKey(const char key) {
                 _database->setMotorType(ch, motorType);
             }
             _selection = 0;
+            _data["selection"] = "param_0";
         }
         break;
     default: {//1~9
@@ -77,6 +81,7 @@ MachineState* MotorTypeSetting::pressKey(const char key) {
         std::string &param_0 = _data[param];
         rotate(param_0.begin(), param_0.begin()+1, param_0.end());
         param_0[param_0.length()-1] = key;
+        _data["selection"] = param;
         break;}
     }
     return next;

@@ -1,7 +1,7 @@
 #include "SystemSetting.h"
 
 #include "Selling.h"
-
+#include "StopSelling.h"
 #include "EnterPasswordOfVendingMachineModeSetting.h"
 #include "EnterPasswordOfMainManagement.h"
 #include "EnterPasswordOfAdditionalStock.h"
@@ -23,7 +23,11 @@ MachineState* SystemSetting::pressKey(const char key) {
     MachineState* next = this;
     switch ( key ) {
     case '*':
-        next = Selling::getInstance();
+        if (StopSelling::isStop()) {
+            return StopSelling::getInstance();
+        } else {
+            next = Selling::getInstance();
+        }
         break;
     case '1':
         next = EnterPasswordOfVendingMachineModeSetting::getInstance();

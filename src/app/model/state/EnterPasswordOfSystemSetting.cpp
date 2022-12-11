@@ -2,7 +2,7 @@
 
 #include "SystemSetting.h"
 #include "Selling.h"
-
+#include "StopSelling.h"
 bool EnterPasswordOfSystemSetting::isMatched(int password) {
     return _database->getPasswordOfSystemSetting() == password;
 }
@@ -18,6 +18,8 @@ MachineState* EnterPasswordOfSystemSetting::decide(int password) {
 MachineState* EnterPasswordOfSystemSetting::cancel() {
     if (_isChangePasswords) {
         return PasswordChange::getInstance();
+    } else if (StopSelling::isStop()) {
+        return StopSelling::getInstance();
     }
     return Selling::getInstance();
 }

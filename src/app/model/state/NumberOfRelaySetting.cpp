@@ -28,6 +28,7 @@ MachineState* NumberOfRelaySetting::pressKey(const char key) {
         numOfRelay = std::stoi(_data["param_0"]);
         if ( 0 < numOfRelay && numOfRelay <= 64) {
             _database->setNumberOfRelay(numOfRelay);
+            _data["deinitRelays"] = "Running";
         }
         break;
     default:{

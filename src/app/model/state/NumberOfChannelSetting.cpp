@@ -27,17 +27,22 @@ MachineState* NumberOfChannelSetting::pressKey(const char key) {
         break;
     case '#':
         if ( _selection == 0) {
+            int start = std::stoi(_data["param_0"]);
+            if ( !(0 < start && start <= _database->getNumberOfRelays()) )
+                break;
+
             _selection = 1;
             _data["selection"] = "param_1";
         } else if ( _selection == 1) {
+            int end = std::stoi(_data["param_1"]);
+            if ( !(0 < end && end <= _database->getNumberOfRelays()) )
+                break;
             _selection = 2;
             _data["selection"] = "param_2";
         } else if ( _selection == 2) {
             int start = std::stoi(_data["param_0"]);
             int end = std::stoi(_data["param_1"]);
             int numOfChannels = std::stoi(_data["param_2"]);
-            if ( start == 0 || end == 0 )
-                break;
 
             _selection = 0;
             _data["selection"] = "param_0";
@@ -45,6 +50,7 @@ MachineState* NumberOfChannelSetting::pressKey(const char key) {
                 // relay index is i-1 (started zero index)
                 _database->setNumberOfChannels(i-1, numOfChannels);
             }
+            _data["deinitRelays"] = "Running";
         }
         break;
     default: {//1~9

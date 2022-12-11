@@ -41,26 +41,6 @@ void MachineData::defineDefaultsData() {
     setNumberOfTotalSales(0);
     setMoneyOfManualSales(0);
     setNumberOfManualSales(0);
-
-    //default relay settings
-    const int numOfDefaultChannels = 16;
-    const int defaultMotorType = 1;
-    int nRelay = getNumberOfRelay();
-    for (int i = 0; i < nRelay; i++) {
-        setNumberOfChannels(i, numOfDefaultChannels);
-        setRelayType(i, defaultMotorType);
-    }
-
-    //default column settings
-    const int numOfColumns = numOfDefaultRelay*numOfDefaultChannels;
-    for (int i = 0; i < numOfColumns; i++) {
-        setMotorType(i, 1);
-        setQuantity(i, 0);
-        setPrice(i, 0);
-        setChannel(i, i);
-        setAdditional(i, 0);
-        setSalesAmount(i, 0);
-    }
 }
 void MachineData::initialize() {
     if ( !LittleFS.begin() ) {
@@ -185,9 +165,28 @@ uint32_t MachineData::getRelayType(int idx) {
     return getRelayData(idx, RelayType);
 }
 void MachineData::setNumberOfChannels(int idx, uint32_t data) {
-    int before = getNumberOfChannels(idx);
+    int _s, _e;
+    int delta = data - getNumberOfChannels(idx);
+    if (delta == 0) {
+        return;
+    } else if (delta > 0 ) { // Increase column
+        _s = _numberOfColumns;
+        _e = _s + delta;
+    } else { // Decrease column
+        _e = _numberOfColumns;
+        _s = _e + delta;
+    }
+
+    for(int i = _s; i < _e; i += 1) {
+        setMotorType(i, 1);
+        setQuantity(i, 0);
+        setPrice(i, 0);
+        setChannel(i, i);
+        setAdditional(i, 0);
+        setSalesAmount(i, 0);
+    }
+    _numberOfColumns += delta;
     setRelayData(idx, NumberOfChannels, data);
-    _numberOfColumns -= (before-data);
 }
 void MachineData::setRelayType(int idx, uint32_t data) {
     setRelayData(idx, RelayType, data);
@@ -264,14 +263,23 @@ void MachineData::setBanknoteReaderMode(uint32_t mode) {
     setStaticData(BanknoteReaderMode, mode);
 }
 void MachineData::setNumberOfRelay(uint32_t number) {
-    if ( _numberOfRelays == number )
+    int delta = number - _numberOfRelays;
+    if (delta == 0) {
         return;
-    else if ( number < _numberOfRelays) {
-        for (int i = _numberOfRelays-1; i >= number; i--) {
-            _numberOfColumns -= getRelayData(i, NumberOfChannels);
+    } else if (delta > 0) { // Increase number of relays
+        int _s = _numberOfRelays;
+        int _e = number;
+        for(int i = _s; i < _e; i++) {
+            setNumberOfChannels(i, 16); // Default channel number is 16
+            setRelayType(i, 1); // Default relay type is 1
+        }
+    } else { // Decrease number of relays
+        int _s = _numberOfRelays;
+        int _e = number;
+        for(int i = _s; i < _e; i--) {
+            setNumberOfChannels(i, 0);
         }
     }
-
     _numberOfRelays = number;
     setStaticData(NumberOfRelay, number);
 }

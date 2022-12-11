@@ -46,6 +46,7 @@ private:
 
     int setupKeypad();
     int setupBankNoteReader();
+    int deinitRelays();
     int setupRelays();
     int setupMachine();
 

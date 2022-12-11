@@ -101,6 +101,11 @@ int Controller::setupMachine() {
         if(data["keyEvent"] != "") {
             putMessage(MessageKeypadPress, data["keyEvent"][0], 1000);
         }
+
+        if(data["deinitRelays"] == "Running") {
+            deinitRelays();
+            data["deinitRelays"] = "end";
+        }
     };
     auto onTimeoutCallback = [&](const int signal) {
         putMessage(MessageTimeout, signal);
@@ -179,25 +184,31 @@ int Controller::setupBankNoteReader() {
     return _bankNoteReader->initialized();
 }
 
+int Controller::deinitRelays() {
+    for(auto _r : _relays) {
+        delete _r;
+    }
+    _relays.clear();
+    int nRelays = _machine->_database->getNumberOfRelays();
+    for (int i = 0; i < nRelays; i++) {
+        int _type = _machine->_database->getRelayType(i);
+        int numOfCh = _machine->_database->getNumberOfChannels(i);
+        if (_type == 1) {
+            _relays.push_back(new R4D3B16(i+1, numOfCh, Serial1)); //i + 1 is relay address
+        }
+    }
+    return 0;
+}
 
 int Controller::setupRelays() {
     enum {MAX485_RO = 1, MAX485_DI = 0,};
-    int nRelays = _machine->_database->getNumberOfRelays();
-    _relays.clear();
-
     Serial1.setRX(MAX485_RO);
     Serial1.setTX(MAX485_DI);
     Serial1.begin(9600);
 
-    // To do relay polymorphism
-    for (int i = 0; i < nRelays; i++) {
-        int numOfCh = _machine->_database->getNumberOfChannels(i);
-        Serial.printf("num of ch %d \n\r", numOfCh);
-
-        //Toto set relay type by database
-        _relays.push_back(new R4D3B16(i+1, numOfCh, Serial1)); //i + 1 is relay address
-        for (int j = 0; j < numOfCh; j++)
-            _relays[i]->close(j+1);
+    deinitRelays();
+    for (int i = 0; i < _machine->_database->getNumberOfColumns(); i++) {
+        putMessage(MessageRelayClose, i);
     }
     return 0;
 }
@@ -207,7 +218,7 @@ void Controller::setup() {
     _display->begin();
     delay(1000);
     // Controller loop Queue Create
-    _q = xQueueCreate(32, sizeof(Message));
+    _q = xQueueCreate(256, sizeof(Message));
     if (setupMachine() < 0) {
         return;
     }
@@ -285,6 +296,7 @@ void Controller::operateDevice(Message &Message) {
         int channel = Message.data;
         auto r_ch = convertChannelToRelayFromModel(channel);
         _relays[r_ch.first]->open(r_ch.second);
+        Serial.println("relay open");
         break;
     } case MessageRelayClose: {
         int channel = Message.data;

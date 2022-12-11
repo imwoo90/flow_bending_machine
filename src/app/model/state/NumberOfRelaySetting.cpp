@@ -20,6 +20,9 @@ NumberOfRelaySetting* NumberOfRelaySetting::getInstance() {
 MachineState* NumberOfRelaySetting::pressKey(const char key) {
     int numOfRelay;
     MachineState* next = this;
+
+    _data["deinitRelays"] = "";
+
     switch ( key ) {
     case '*':
         next = VendingMachineModeSetting::getInstance();

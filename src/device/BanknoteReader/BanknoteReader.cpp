@@ -20,10 +20,11 @@ void BanknoteReader::registerBillDataCallBack(std::function<void(const int)> onR
 
 int BanknoteReader::initialized() {
     enum {
-        Priority = configMAX_PRIORITIES - 2,
+        Priority = configMAX_PRIORITIES/2 - 1,
     };
     _q = xQueueCreate(16, 0);
-    xTaskCreate(banknoteEventTask, _name.c_str(), 512, this, Priority, &_eventTask);
     disable();
+    xTaskCreate(banknoteEventTask, _name.c_str(), 512, this, Priority, &_eventTask);
+    vTaskCoreAffinitySet(_eventTask, 1 << 1);
     return 0;
 }

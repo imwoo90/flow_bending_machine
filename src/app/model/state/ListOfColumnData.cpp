@@ -52,14 +52,15 @@ void ListOfColumnData::loadListOfColumnData() {
         int column = _page*NUMBER_PER_PAGE + i;
         int channel = _database->getChannel(column);
         int motorType = _database->getMotorType(column);
+        bool isOverRange = column >= _database->getNumberOfColumns();
 
         column += 1; channel += 1; // match user's recognize column and channel
         param = prefix + itoa(param_index++, buf, 10);
-        _data[param] = itoa(channel, buf, 10);
+        _data[param] = isOverRange ? "" : itoa(channel, buf, 10);
         param = prefix + itoa(param_index++, buf, 10);
-        _data[param] = itoa(column, buf, 10);
+        _data[param] = isOverRange ? "" : itoa(column, buf, 10);
         param = prefix + itoa(param_index++, buf, 10);
-        _data[param] = itoa(motorType, buf, 10);
+        _data[param] = isOverRange ? "" : itoa(motorType, buf, 10);
     }
     param = prefix + itoa(param_index++, buf, 10);
     _data[param] = std::string("p")+itoa(_page+1, buf, 10);

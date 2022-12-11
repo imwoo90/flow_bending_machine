@@ -26,8 +26,6 @@ void MachineData::defineDefaultsData() {
     Serial.println("little fs format end");
 
     //default static length data
-    const int numOfDefaultRelay = 2;
-    setStaticData(IsInit, 1);
     setPasswordOfSystemManagement(999);
     setPasswordOfSystemSetting(1234);
     setPasswordOfVendingMachineModeSetting(12345678);
@@ -36,11 +34,12 @@ void MachineData::defineDefaultsData() {
     setPasswordOfManualSales(123456);
     setPasswordOfPasswordChange(123456);
     setBanknoteReaderMode(1);
-    setNumberOfRelay(numOfDefaultRelay);
+    setNumberOfRelay(0);
     setMoneyOfTotalSales(0);
     setNumberOfTotalSales(0);
     setMoneyOfManualSales(0);
     setNumberOfManualSales(0);
+    setStaticData(IsInit, 1);
 }
 void MachineData::initialize() {
     if ( !LittleFS.begin() ) {
@@ -62,16 +61,19 @@ void MachineData::initialize() {
 }
 
 void MachineData::setStaticData(StaticData id, uint32_t data) {
+    FSInfo info;
+    LittleFS.info(info);
+    Serial.printf("total %d, used %d", info.totalBytes, info.usedBytes);
     File _file = LittleFS.open(root+preFixStaticData[id], "w");
     _file.write((uint8_t*)&data, sizeof(data));
-    _file.flush();
-    // _file.close();
+    // _file.flush();
+    _file.close();
 }
 uint32_t MachineData::getStaticData(StaticData id) {
     uint32_t buf = 0;
     File _file = LittleFS.open(root+preFixStaticData[id], "r");
     _file.read((uint8_t*)&buf, sizeof(buf));
-    // _file.close();
+    _file.close();
     return buf;
 }
 uint32_t MachineData::getColumnData(int idx, ColumData id) {
@@ -82,7 +84,7 @@ uint32_t MachineData::getColumnData(int idx, ColumData id) {
 
     uint32_t buf = 0;
     _file.read((uint8_t*)&buf, sizeof(buf));
-    // _file.close();
+    _file.close();
     return buf;
 }
 uint32_t MachineData::getRelayData(int idx, RelayData id) {
@@ -93,10 +95,14 @@ uint32_t MachineData::getRelayData(int idx, RelayData id) {
 
     uint32_t buf = 0;
     _file.read((uint8_t*)&buf, sizeof(buf));
-    // _file.close();
+    _file.close();
     return buf;
 }
 void MachineData::setColumnData(int idx, ColumData id, uint32_t data) {
+    FSInfo info;
+    LittleFS.info(info);
+    Serial.printf("total %d, used %d", info.totalBytes, info.usedBytes);
+
     char tmp[32];
     String path = root + preFixColumData[id];
     String idx_str = itoa(idx, tmp, 10);
@@ -104,10 +110,14 @@ void MachineData::setColumnData(int idx, ColumData id, uint32_t data) {
 
     uint32_t buf = 0;
     _file.write((uint8_t*)&data, sizeof(data));
-    _file.flush();
-    // _file.close();
+    // _file.flush();
+    _file.close();
 }
 void MachineData::setRelayData(int idx, RelayData id, uint32_t data) {
+    FSInfo info;
+    LittleFS.info(info);
+    Serial.printf("total %d, used %d", info.totalBytes, info.usedBytes);
+
     char tmp[32];
     String path = root + preFixRelayData[id];
     String idx_str = itoa(idx, tmp, 10);
@@ -115,8 +125,8 @@ void MachineData::setRelayData(int idx, RelayData id, uint32_t data) {
 
     uint32_t buf = 0;
     _file.write((uint8_t*)&data, sizeof(data));
-    _file.flush();
-    // _file.close();
+    // _file.flush();
+    _file.close();
 }
 
 //ColumData
@@ -270,13 +280,13 @@ void MachineData::setNumberOfRelay(uint32_t number) {
         int _s = _numberOfRelays;
         int _e = number;
         for(int i = _s; i < _e; i++) {
-            setNumberOfChannels(i, 16); // Default channel number is 16
+            setNumberOfChannels(i, 0); // Default channel number is 0
             setRelayType(i, 1); // Default relay type is 1
         }
     } else { // Decrease number of relays
         int _s = _numberOfRelays;
         int _e = number;
-        for(int i = _s; i < _e; i--) {
+        for(int i = _s; i >= _e; i--) {
             setNumberOfChannels(i, 0);
         }
     }

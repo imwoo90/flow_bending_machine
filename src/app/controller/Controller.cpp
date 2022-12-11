@@ -124,7 +124,6 @@ int Controller::setupMachine() {
 
         if(data["deinitRelays"] == "Running") {
             deinitRelays();
-            data["deinitRelays"] = "end";
         }
     };
     auto onTimeoutCallback = [&](const int signal) {
@@ -178,6 +177,7 @@ int Controller::setupKeypad() {
         it expires. */
         _keypadOffLED
     );
+    _keypad->startPolling();
     return 0;
 }
 
@@ -227,9 +227,9 @@ int Controller::setupRelays() {
     Serial1.begin(9600);
 
     deinitRelays();
-    for (int i = 0; i < _machine->_database->getNumberOfColumns(); i++) {
-        putMessage(MessageRelayClose, i);
-    }
+    // for (int i = 0; i < _machine->_database->getNumberOfColumns(); i++) {
+    //     putMessage(MessageRelayClose, i);
+    // }
     return 0;
 }
 

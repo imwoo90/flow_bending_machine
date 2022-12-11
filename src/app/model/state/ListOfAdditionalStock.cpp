@@ -106,14 +106,15 @@ void ListOfAdditionalStock::loadListOfAdditionalStock() {
         int column = _page*NUMBER_PER_PAGE + i;
         int price = _database->getPrice(column);
         int additional = _database->getAdditional(column);
+        bool isOverRange = column >= _database->getNumberOfColumns();
 
         column += 1;// match user's recognize column
         param = prefix + itoa(param_index++, buf, 10);
-        _data[param] = itoa(column, buf, 10);
+        _data[param] = isOverRange ? "" : itoa(column, buf, 10);
         param = prefix + itoa(param_index++, buf, 10);
-        _data[param] = itoa(price/1000, buf, 10);
+        _data[param] = isOverRange ? "" : itoa(price/1000, buf, 10);
         param = prefix + itoa(param_index++, buf, 10);
-        _data[param] = itoa(additional, buf, 10);
+        _data[param] = isOverRange ? "" : itoa(additional, buf, 10);
     }
     param = prefix + itoa(param_index++, buf, 10);
     _data[param] = std::string("p")+itoa(_page+1, buf, 10);

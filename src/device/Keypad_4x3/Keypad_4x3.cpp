@@ -33,13 +33,14 @@ int  Keypad_4x3::pin_read(byte pinNum) {
     return read;
 }
 
-static void task_initialize() {
+void Keypad_4x3::startPolling() {
     enum {
-        Priority = configMAX_PRIORITIES / 2 - 1,
+        Priority = configMAX_PRIORITIES/2 - 1,
     };
 
     static TaskHandle_t _keypadTask;
     xTaskCreate(scan_task, "KEYPAD_4X3", 1024, 0, Priority, &_keypadTask);
+    vTaskCoreAffinitySet(_keypadTask, 1 << 1);
 }
 
 Keypad_4x3::Keypad_4x3(char *userKeymap, byte *row, byte *col, byte numRows, byte numCols) :
@@ -56,8 +57,6 @@ Keypad_4x3::Keypad_4x3(char *userKeymap, byte *row, byte *col, byte numRows, byt
 
     pcf8574.begin();
     pinMode(3, OUTPUT);
-
-    task_initialize();
 }
 
 Keypad_4x3* Keypad_4x3::getInstance() {

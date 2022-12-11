@@ -21,6 +21,9 @@ NumberOfChannelSetting* NumberOfChannelSetting::getInstance() {
 
 MachineState* NumberOfChannelSetting::pressKey(const char key) {
     MachineState* next = this;
+
+    _data["deinitRelays"] = "";
+
     switch ( key ) {
     case '*':
         next = VendingMachineModeSetting::getInstance();

@@ -15,6 +15,7 @@ public:
     virtual int  pin_read(byte pinNum);
 
     static Keypad_4x3* getInstance();
+    void startPolling();
     void onLED();
     void offLED();
     void subscribe(std::function<void(const KeyState, const char)> callback);

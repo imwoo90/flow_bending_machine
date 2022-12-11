@@ -56,16 +56,15 @@ MachineState* EnterProductNumber::pressKey(const char key) {
         int n = std::stoi(_data["param_0"])-1;
         if ( n+1 == _database->getPasswordOfSystemManagement() ){
             next = EnterPasswordOfSystemSetting::getInstance();
-            break;
         } else if ( 0 <= n && n < _database->getNumberOfColumns() ) {
             int total_quantity = _database->getQuantity(n) + _database->getAdditional(n);
             if (total_quantity > 0) {
                 next =InputMoney::getInstance(n);
-                break;
+            } else {
+                next = EnterProductNumberNoGoods::getInstance();
             }
         } else {
             next = EnterProductNumberNoGoods::getInstance();
-            break;
         }
         break;}
     case '*': {

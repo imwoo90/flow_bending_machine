@@ -10,5 +10,6 @@ private:
 public:
     static ColumnTestManul* getInstance();
 
+    virtual MachineState* releaseKey(const char key);
     virtual MachineState* pressKey(const char key);
 };

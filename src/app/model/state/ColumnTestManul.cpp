@@ -15,10 +15,15 @@ ColumnTestManul* ColumnTestManul::getInstance() {
     return &singleton_instance;
 }
 
-MachineState* ColumnTestManul::pressKey(const char key) {
-    MachineState* next = this;
+MachineState* ColumnTestManul::releaseKey(const char key) {
     _data["LockerType"] = "";
     _data["LockerChannel"] = "";
+    return this;
+}
+
+MachineState* ColumnTestManul::pressKey(const char key) {
+    MachineState* next = this;
+
     switch ( key ) {
     case '#':{
         char buf[32];

@@ -25,6 +25,5 @@ int BanknoteReader::initialized() {
     _q = xQueueCreate(16, 0);
     disable();
     xTaskCreate(banknoteEventTask, _name.c_str(), 512, this, Priority, &_eventTask);
-    vTaskCoreAffinitySet(_eventTask, 1 << 1);
     return 0;
 }

@@ -21,5 +21,6 @@ public:
     void pressKey(const char key);
     void releaseKey(const char key);
     void recognizeBanknote(const int bankNote);
+    void systemMessage(const SystemMessage msg);
     void timeout(const int signal);
 };

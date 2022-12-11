@@ -68,7 +68,26 @@ int Controller::setupMachine() {
     attachInterrupt(2, motorRoundCallback, FALLING, this);
 
     auto onChangedCallback = [&](std::unordered_map<std::string, std::string> data) {
+        static std::unordered_map<std::string, std::string> _prevData;
+        bool isSame = true;
+        for (auto &cur : data) {
+            auto it = _prevData.find(cur.first);
+            if (it == _prevData.end()) {
+                isSame = false;
+                break;
+            }
+            if (it->second != cur.second) {
+                Serial.printf("%s\r\n", cur.second.c_str());
+                isSame = false;
+                break;
+            }
+        }
+        if (isSame)
+            return;
+
         Serial.printf("%s\r\n", data["state"].c_str());
+        _prevData = data;
+
 
         _display->show(data);
 
@@ -98,8 +117,9 @@ int Controller::setupMachine() {
             putMessage(MessageRelayClose, channel);
         }
 
-        if(data["keyEvent"] != "") {
-            putMessage(MessageKeypadPress, data["keyEvent"][0], 1000);
+        if(data["sysMsg"] == "DelayCall") {
+            int delay = std::stoi(data["sysMsgArg_0"]);
+            putMessage(MessageSystemMessage, DelayCall, delay);
         }
 
         if(data["deinitRelays"] == "Running") {
@@ -267,6 +287,9 @@ void Controller::processModel(Message &Message) {
         break;
     case MessageBanknoteRecognize:
         _machine->recognizeBanknote(Message.data);
+        break;
+    case MessageSystemMessage:
+        _machine->systemMessage((SystemMessage)Message.data);
         break;
     case MessageTimeout:
         _machine->timeout(Message.data);

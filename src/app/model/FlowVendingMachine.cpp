@@ -34,6 +34,11 @@ void FlowVendingMachine::recognizeBanknote(const int bankNote) {
     MachineState::_onChangedCallback(_state->_data);
 }
 
+void FlowVendingMachine::systemMessage(const SystemMessage msg) {
+    _state = _state->systemMessage(msg);
+    MachineState::_onChangedCallback(_state->_data);
+}
+
 void FlowVendingMachine::timeout(const int signal) {
     _state = _state->timeout(signal);
     MachineState::_onChangedCallback(_state->_data);

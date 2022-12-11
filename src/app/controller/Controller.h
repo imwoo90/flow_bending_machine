@@ -16,6 +16,7 @@ typedef enum {
     MessageKeypadPress,
     MessageKeypadRelease,
     MessageBanknoteRecognize,
+    MessageSystemMessage,
     MessageTimeout,
 
     MessageBanknoteReaderEnable,

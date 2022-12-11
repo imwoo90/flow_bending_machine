@@ -5,12 +5,13 @@
 
 class ColumnTestSection : public MachineState {
 private:
-    int _selection;
+    int _selection, _column, _running_test;
 
     ColumnTestSection() {}
     virtual void initialize();
 public:
     static ColumnTestSection* getInstance();
 
+    virtual MachineState* systemMessage(const SystemMessage mgs);
     virtual MachineState* pressKey(const char key);
 };

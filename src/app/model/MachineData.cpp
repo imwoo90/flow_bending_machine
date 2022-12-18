@@ -57,6 +57,12 @@ void MachineData::initialize() {
     }
 }
 
+void MachineData::readFile(const char* path, uint8_t *buf, uint32_t size) {
+    File _file = LittleFS.open(path, "r");
+    _file.seek(0, SeekSet);
+    _file.read(buf, size);
+}
+
 void MachineData::setStaticData(StaticData id, uint32_t data) {
     File _file = LittleFS.open(STATIC_DATA_PATH, "r+");
     _file.seek(4*id, SeekSet);
@@ -165,6 +171,16 @@ void MachineData::setSalesAmount(int idx, uint32_t data) {
 }
 
 //RelayData
+void MachineData::initAdditionalData() {
+    uint32_t *buf = new uint32_t[NumofColumnData*MaxNumOfColumn];
+    readFile(COLUMN_DATA_PATH, (uint8_t*)buf, sizeof(uint32_t)*NumofColumnData*MaxNumOfColumn);
+    for(int i = 0; i < MaxNumOfColumn; i++) {
+        buf[sizeof(uint32_t)*NumofColumnData*i + Additional] = 0;
+    }
+    File _file = LittleFS.open(COLUMN_DATA_PATH, "w");
+    _file.write((uint8_t*)buf, sizeof(uint32_t)*NumofColumnData*MaxNumOfColumn);
+    delete buf;
+}
 uint32_t MachineData::getNumberOfChannels(int idx) {
     return getRelayData(idx, NumberOfChannels);
 }

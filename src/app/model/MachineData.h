@@ -59,6 +59,8 @@ private:
     uint32_t _numberOfRelays = 0;
     uint32_t _numberOfColumns = 0;
 
+    void readFile(const char* path, uint8_t *buf, uint32_t size);
+
     //static length data
     void setStaticData(StaticData pos, uint32_t data);
     uint32_t getStaticData(StaticData pos);
@@ -69,7 +71,6 @@ private:
     void setRelayData(int idx, RelayData pos, uint32_t data);
     void setColumnData(int idx, ColumData pos, uint32_t data);
     void initColumnData(int s, int e);
-
 
     MachineData() {}
 public:
@@ -84,6 +85,7 @@ public:
     void initialize();
 
     //ColumData
+    void initAdditionalData();
     uint32_t getMotorType(int idx);
     uint32_t getQuantity(int idx);
     uint32_t getPrice(int idx);

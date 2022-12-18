@@ -44,10 +44,8 @@ ListOfAdditionalStock* ListOfAdditionalStock::getInstance() {
 }
 
 MachineState* ListOfAdditionalStock::timeout(const int signal) {
-    for (int column = 0; column < _database->getNumberOfColumns(); column++)
-        _database->setAdditional(column, 0);
+    _database->initAdditionalData();
     loadListOfAdditionalStock();
-
     return this;
 }
 

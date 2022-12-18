@@ -46,6 +46,14 @@ typedef enum {
 } RelayData;
 #undef X
 
+enum {
+    NumOfStaticData = NumberOfManualSales + 1,
+    NumofColumnData = SalesAmount + 1,
+    NumOfRelayData = RelayType + 1,
+    MaxNumOfColumn = 999,
+    MaxNumOfRelay = 99,
+};
+
 class MachineData {
 private:
     uint32_t _numberOfRelays = 0;
@@ -60,6 +68,8 @@ private:
     uint32_t getColumnData(int idx, ColumData pos);
     void setRelayData(int idx, RelayData pos, uint32_t data);
     void setColumnData(int idx, ColumData pos, uint32_t data);
+    void initColumnData(int s, int e);
+
 
     MachineData() {}
 public:

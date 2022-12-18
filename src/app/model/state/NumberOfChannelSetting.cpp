@@ -47,12 +47,13 @@ MachineState* NumberOfChannelSetting::pressKey(const char key) {
             int end = std::stoi(_data["param_1"]);
             int numOfChannels = std::stoi(_data["param_2"]);
 
-            _selection = 0;
-            _data["selection"] = "param_0";
             for(int i = start; i <= end; i++) {
                 // relay index is i-1 (started zero index)
                 _database->setNumberOfChannels(i-1, numOfChannels);
             }
+
+            _selection = 0;
+            _data["selection"] = "param_0";
             _data["deinitRelays"] = "Running";
         }
         break;

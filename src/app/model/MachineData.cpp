@@ -1,20 +1,9 @@
 #include <MachineData.h>
 #include <LittleFS.h>
 
-#define X(name) #name,
-static const char* preFixStaticData[] = {
-    STATIC_DATA
-};
-static const char* preFixColumData[] = {
-    COLUMN_DATA
-};
-
-static const char* preFixRelayData[] = {
-    RELAY_DATA
-};
-#undef X
-
-String root = "/";
+#define STATIC_DATA_PATH "/static_data"
+#define COLUMN_DATA_PATH "/ColumData"
+#define RELAY_DATA_PATH "/RelayData"
 
 void MachineData::defineDefaultsData() {
     delay(5000);
@@ -24,6 +13,14 @@ void MachineData::defineDefaultsData() {
         return ;
     }
     Serial.println("little fs format end");
+
+    // initialize
+    File _file = LittleFS.open(STATIC_DATA_PATH, "w");
+    _file.truncate(4*NumOfStaticData);
+    _file = LittleFS.open(COLUMN_DATA_PATH, "w");
+    _file.truncate(4*NumofColumnData*MaxNumOfColumn);
+    _file = LittleFS.open(RELAY_DATA_PATH, "w");
+    _file.truncate(4*NumOfRelayData*MaxNumOfRelay);
 
     //default static length data
     setPasswordOfSystemManagement(999);
@@ -47,9 +44,9 @@ void MachineData::initialize() {
         return;
     }
 
-    // LittleFS.remove("/IsInit");
+    // setStaticData(IsInit, 0);
 
-    if ( !LittleFS.exists(root+preFixStaticData[IsInit]) ) {
+    if ( !LittleFS.exists(STATIC_DATA_PATH) || !getStaticData(IsInit)) {
         defineDefaultsData();
     }
 
@@ -61,72 +58,72 @@ void MachineData::initialize() {
 }
 
 void MachineData::setStaticData(StaticData id, uint32_t data) {
-    FSInfo info;
-    LittleFS.info(info);
-    Serial.printf("total %d, used %d", info.totalBytes, info.usedBytes);
-    File _file = LittleFS.open(root+preFixStaticData[id], "w");
+    File _file = LittleFS.open(STATIC_DATA_PATH, "r+");
+    _file.seek(4*id, SeekSet);
     _file.write((uint8_t*)&data, sizeof(data));
     // _file.flush();
-    _file.close();
 }
 uint32_t MachineData::getStaticData(StaticData id) {
     uint32_t buf = 0;
-    File _file = LittleFS.open(root+preFixStaticData[id], "r");
+    File _file = LittleFS.open(STATIC_DATA_PATH, "r");
+    _file.seek(4*id, SeekSet);
     _file.read((uint8_t*)&buf, sizeof(buf));
-    _file.close();
     return buf;
 }
-uint32_t MachineData::getColumnData(int idx, ColumData id) {
-    char tmp[32];
-    String path = root + preFixColumData[id];
-    String idx_str = itoa(idx, tmp, 10);
-    File _file = LittleFS.open(path+idx_str, "r");
-
-    uint32_t buf = 0;
-    _file.read((uint8_t*)&buf, sizeof(buf));
-    _file.close();
-    return buf;
-}
-uint32_t MachineData::getRelayData(int idx, RelayData id) {
-    char tmp[32];
-    String path = root + preFixRelayData[id];
-    String idx_str = itoa(idx, tmp, 10);
-    File _file = LittleFS.open(path+idx_str, "r");
-
-    uint32_t buf = 0;
-    _file.read((uint8_t*)&buf, sizeof(buf));
-    _file.close();
-    return buf;
+void MachineData::initColumnData(int s, int e) {
+    // std::vector<uint32_t> _init((e-s)*NumofColumnData);
+    uint32_t* _init = new uint32_t[(e-s)*NumofColumnData];
+    int init_idx = 0;
+    for (int i = s; i < e; i++) {
+        _init[init_idx++] = 1;
+        _init[init_idx++] = 0;
+        _init[init_idx++] = 0;
+        _init[init_idx++] = i;
+        _init[init_idx++] = 0;
+        _init[init_idx++] = 0;
+    }
+    File _file = LittleFS.open(COLUMN_DATA_PATH, "r+");
+    _file.seek(4*NumofColumnData*s, SeekSet);
+    _file.write((uint8_t*)_init, 4*NumofColumnData*(e-s));
+    delete _init;
 }
 void MachineData::setColumnData(int idx, ColumData id, uint32_t data) {
     FSInfo info;
     LittleFS.info(info);
     Serial.printf("total %d, used %d", info.totalBytes, info.usedBytes);
 
-    char tmp[32];
-    String path = root + preFixColumData[id];
-    String idx_str = itoa(idx, tmp, 10);
-    File _file = LittleFS.open(path+idx_str, "w");
-
-    uint32_t buf = 0;
+    File _file = LittleFS.open(COLUMN_DATA_PATH, "r+");
+    _file.seek(4*NumofColumnData*idx + 4*id, SeekSet);
     _file.write((uint8_t*)&data, sizeof(data));
     // _file.flush();
-    _file.close();
+}
+uint32_t MachineData::getColumnData(int idx, ColumData id) {
+    File _file = LittleFS.open(COLUMN_DATA_PATH, "r");
+
+    uint32_t buf = 0;
+    _file.seek(4*NumofColumnData*idx + 4*id, SeekSet);
+    _file.read((uint8_t*)&buf, sizeof(buf));
+    return buf;
 }
 void MachineData::setRelayData(int idx, RelayData id, uint32_t data) {
     FSInfo info;
     LittleFS.info(info);
     Serial.printf("total %d, used %d", info.totalBytes, info.usedBytes);
 
-    char tmp[32];
-    String path = root + preFixRelayData[id];
-    String idx_str = itoa(idx, tmp, 10);
-    File _file = LittleFS.open(path+idx_str, "w");
+    File _file = LittleFS.open(RELAY_DATA_PATH, "r+");
 
     uint32_t buf = 0;
+    _file.seek(4*NumOfRelayData*idx + 4*id, SeekSet);
     _file.write((uint8_t*)&data, sizeof(data));
     // _file.flush();
-    _file.close();
+}
+uint32_t MachineData::getRelayData(int idx, RelayData id) {
+    File _file = LittleFS.open(RELAY_DATA_PATH, "r");
+
+    uint32_t buf = 0;
+    _file.seek(4*NumOfRelayData*idx + 4*id, SeekSet);
+    _file.read((uint8_t*)&buf, sizeof(buf));
+    return buf;
 }
 
 //ColumData
@@ -187,14 +184,7 @@ void MachineData::setNumberOfChannels(int idx, uint32_t data) {
         _s = _e + delta;
     }
 
-    for(int i = _s; i < _e; i += 1) {
-        setMotorType(i, 1);
-        setQuantity(i, 0);
-        setPrice(i, 0);
-        setChannel(i, i);
-        setAdditional(i, 0);
-        setSalesAmount(i, 0);
-    }
+    initColumnData(_s, _e);
     _numberOfColumns += delta;
     setRelayData(idx, NumberOfChannels, data);
 }

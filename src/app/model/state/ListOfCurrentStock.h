@@ -8,7 +8,6 @@
 
 class ListOfCurrentStock : public MachineState {
 private:
-    bool _isDisablePresskey;
     int _page;
 
     ListOfCurrentStock();

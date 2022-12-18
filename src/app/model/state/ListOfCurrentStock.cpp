@@ -24,8 +24,6 @@ ListOfCurrentStock* ListOfCurrentStock::getInstance() {
 
 MachineState* ListOfCurrentStock::pressKey(const char key) {
     MachineState* next = this;
-    if (_isDisablePresskey)
-        return next;
 
     switch ( key ) {
     case '1':
@@ -42,9 +40,6 @@ MachineState* ListOfCurrentStock::pressKey(const char key) {
             break;
         }
         loadListOfCurrentStock();
-        break;
-    case '#':
-        _isDisablePresskey = true;
         break;
     case '*':
         next = MainManagement::getInstance();

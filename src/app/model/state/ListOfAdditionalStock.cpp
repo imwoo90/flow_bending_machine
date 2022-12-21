@@ -44,7 +44,8 @@ ListOfAdditionalStock* ListOfAdditionalStock::getInstance() {
 }
 
 MachineState* ListOfAdditionalStock::timeout(const int signal) {
-    _database->initAdditionalData();
+    //Additional of all columns are setted to 0
+    _database->setColumnBulkChange(Additional, 0, MaxNumOfColumn, 0);
     loadListOfAdditionalStock();
     return this;
 }

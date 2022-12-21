@@ -2,7 +2,7 @@
 #include <LittleFS.h>
 
 #define STATIC_DATA_PATH "/static_data"
-#define COLUMN_DATA_PATH "/ColumData"
+#define COLUMN_DATA_PATH "/ColumnData"
 #define RELAY_DATA_PATH "/RelayData"
 
 void MachineData::defineDefaultsData() {
@@ -44,9 +44,10 @@ void MachineData::initialize() {
         return;
     }
 
-    // setStaticData(IsInit, 0);
+    bool isNotInit = !LittleFS.exists(STATIC_DATA_PATH) || !getStaticData(IsInit)
+        || !LittleFS.exists(COLUMN_DATA_PATH) || !LittleFS.exists(RELAY_DATA_PATH);
 
-    if ( !LittleFS.exists(STATIC_DATA_PATH) || !getStaticData(IsInit)) {
+    if (isNotInit) {
         defineDefaultsData();
     }
 
@@ -93,7 +94,17 @@ void MachineData::initColumnData(int s, int e) {
     _file.write((uint8_t*)_init, 4*NumofColumnData*(e-s));
     delete _init;
 }
-void MachineData::setColumnData(int idx, ColumData id, uint32_t data) {
+void MachineData::setColumnBulkChange(ColumnData id, int start, int count, int data) {
+    uint32_t *buf = new uint32_t[NumofColumnData*MaxNumOfColumn];
+    readFile(COLUMN_DATA_PATH, (uint8_t*)buf, sizeof(uint32_t)*NumofColumnData*MaxNumOfColumn);
+    for(int i = start; i < count; i++) {
+        buf[sizeof(uint32_t)*NumofColumnData*i + id] = data;
+    }
+    File _file = LittleFS.open(COLUMN_DATA_PATH, "w");
+    _file.write((uint8_t*)buf, sizeof(uint32_t)*NumofColumnData*MaxNumOfColumn);
+    delete buf;
+}
+void MachineData::setColumnData(int idx, ColumnData id, uint32_t data) {
     FSInfo info;
     LittleFS.info(info);
     Serial.printf("total %d, used %d", info.totalBytes, info.usedBytes);
@@ -103,7 +114,7 @@ void MachineData::setColumnData(int idx, ColumData id, uint32_t data) {
     _file.write((uint8_t*)&data, sizeof(data));
     // _file.flush();
 }
-uint32_t MachineData::getColumnData(int idx, ColumData id) {
+uint32_t MachineData::getColumnData(int idx, ColumnData id) {
     File _file = LittleFS.open(COLUMN_DATA_PATH, "r");
 
     uint32_t buf = 0;
@@ -132,7 +143,7 @@ uint32_t MachineData::getRelayData(int idx, RelayData id) {
     return buf;
 }
 
-//ColumData
+//ColumnData
 uint32_t MachineData::getMotorType(int idx) {
     return getColumnData(idx, MotorTpye);
 }
@@ -171,16 +182,6 @@ void MachineData::setSalesAmount(int idx, uint32_t data) {
 }
 
 //RelayData
-void MachineData::initAdditionalData() {
-    uint32_t *buf = new uint32_t[NumofColumnData*MaxNumOfColumn];
-    readFile(COLUMN_DATA_PATH, (uint8_t*)buf, sizeof(uint32_t)*NumofColumnData*MaxNumOfColumn);
-    for(int i = 0; i < MaxNumOfColumn; i++) {
-        buf[sizeof(uint32_t)*NumofColumnData*i + Additional] = 0;
-    }
-    File _file = LittleFS.open(COLUMN_DATA_PATH, "w");
-    _file.write((uint8_t*)buf, sizeof(uint32_t)*NumofColumnData*MaxNumOfColumn);
-    delete buf;
-}
 uint32_t MachineData::getNumberOfChannels(int idx) {
     return getRelayData(idx, NumberOfChannels);
 }

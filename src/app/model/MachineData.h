@@ -39,7 +39,7 @@ typedef enum {
 } StaticData;
 typedef enum {
     COLUMN_DATA
-} ColumData;
+} ColumnData;
 
 typedef enum {
     RELAY_DATA
@@ -67,9 +67,9 @@ private:
 
     //dynamic length data
     uint32_t getRelayData(int idx, RelayData pos);
-    uint32_t getColumnData(int idx, ColumData pos);
+    uint32_t getColumnData(int idx, ColumnData pos);
     void setRelayData(int idx, RelayData pos, uint32_t data);
-    void setColumnData(int idx, ColumData pos, uint32_t data);
+    void setColumnData(int idx, ColumnData pos, uint32_t data);
     void initColumnData(int s, int e);
 
     MachineData() {}
@@ -84,8 +84,8 @@ public:
     void defineDefaultsData();
     void initialize();
 
-    //ColumData
-    void initAdditionalData();
+    //ColumnData
+    void setColumnBulkChange(ColumnData id, int start, int count, int data);
     uint32_t getMotorType(int idx);
     uint32_t getQuantity(int idx);
     uint32_t getPrice(int idx);

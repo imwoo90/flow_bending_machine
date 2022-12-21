@@ -98,7 +98,7 @@ void MachineData::setColumnBulkChange(ColumnData id, int start, int count, int d
     uint32_t *buf = new uint32_t[NumofColumnData*MaxNumOfColumn];
     readFile(COLUMN_DATA_PATH, (uint8_t*)buf, sizeof(uint32_t)*NumofColumnData*MaxNumOfColumn);
     for(int i = start; i < count; i++) {
-        buf[sizeof(uint32_t)*NumofColumnData*i + id] = data;
+        buf[NumofColumnData*i + id] = data;
     }
     File _file = LittleFS.open(COLUMN_DATA_PATH, "w");
     _file.write((uint8_t*)buf, sizeof(uint32_t)*NumofColumnData*MaxNumOfColumn);

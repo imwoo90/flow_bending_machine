@@ -44,6 +44,7 @@ MachineState* MatchingChannelAndColumn::pressKey(const char key) {
             _selection = 0;
             _data["selection"] = "param_0";
             _database->setChannel(column, channel);
+            _database->flush(TypeColumnData);
         }
         break;
     default: {//1~9

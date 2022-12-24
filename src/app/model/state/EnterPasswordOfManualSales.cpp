@@ -10,6 +10,7 @@ bool EnterPasswordOfManualSales::isMatched(int password) {
 MachineState* EnterPasswordOfManualSales::decide(int password) {
     if (_isChangePasswords) {
         _database->setPasswordOfManualSales(password);
+        _database->flush(TypeStaticData);
         return this;
     }
     return ManualSales::getInstance();

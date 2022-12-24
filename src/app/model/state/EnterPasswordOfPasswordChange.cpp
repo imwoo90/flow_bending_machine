@@ -9,6 +9,7 @@ bool EnterPasswordOfPasswordChange::isMatched(int password) {
 MachineState* EnterPasswordOfPasswordChange::decide(int password) {
     if (_isChangePasswords) {
         _database->setPasswordOfPasswordChange(password);
+        _database->flush(TypeStaticData);
         return this;
     }
     return PasswordChange::getInstance();

@@ -26,6 +26,7 @@ MachineState* ManualSales::systemMessage(const SystemMessage mgs) {
 
         _database->setNumberOfManualSales(1 + _database->getNumberOfManualSales());
         _database->setMoneyOfManualSales(std::stoi(_data["param_1"]) + _database->getMoneyOfManualSales());
+        _database->flush(TypeStaticData);
         _data["LockerType"] = itoa(_database->getMotorType(_column), buf, 10);
         _data["LockerChannel"] = itoa(_database->getChannel(_column), buf, 10);
         _is_running = false;

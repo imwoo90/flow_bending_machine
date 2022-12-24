@@ -14,13 +14,9 @@ void MachineData::defineDefaultsData() {
     }
     Serial.println("little fs format end");
 
-    // initialize
-    File _file = LittleFS.open(STATIC_DATA_PATH, "w");
-    _file.truncate(4*NumOfStaticData);
-    _file = LittleFS.open(COLUMN_DATA_PATH, "w");
-    _file.truncate(4*NumofColumnData*MaxNumOfColumn);
-    _file = LittleFS.open(RELAY_DATA_PATH, "w");
-    _file.truncate(4*NumOfRelayData*MaxNumOfRelay);
+    memset(_staticDataBuf, 0, sizeof(_staticDataBuf));
+    memset(_columnDataBuf, 0, sizeof(_columnDataBuf));
+    memset(_relayDataBuf, 0, sizeof(_relayDataBuf));
 
     //default static length data
     setPasswordOfSystemManagement(999);
@@ -37,6 +33,7 @@ void MachineData::defineDefaultsData() {
     setMoneyOfManualSales(0);
     setNumberOfManualSales(0);
     setStaticData(IsInit, 1);
+    flush(TypeAll);
 }
 void MachineData::initialize() {
     if ( !LittleFS.begin() ) {
@@ -44,9 +41,10 @@ void MachineData::initialize() {
         return;
     }
 
+    read(TypeAll);
+
     bool isNotInit = !LittleFS.exists(STATIC_DATA_PATH) || !getStaticData(IsInit)
         || !LittleFS.exists(COLUMN_DATA_PATH) || !LittleFS.exists(RELAY_DATA_PATH);
-
     if (isNotInit) {
         defineDefaultsData();
     }
@@ -58,81 +56,60 @@ void MachineData::initialize() {
     }
 }
 
-void MachineData::readFile(const char* path, uint8_t *buf, uint32_t size) {
-    File _file = LittleFS.open(path, "r");
-    _file.seek(0, SeekSet);
-    _file.read(buf, size);
+void MachineData::readOrWrite(int type, std::function<void(const char*, uint8_t *, uint32_t)> work) {
+    const struct {
+        const char* path;
+        uint8_t* buf;
+        uint32_t size;
+    } __tmp[3] = {
+        {STATIC_DATA_PATH, (uint8_t*)_staticDataBuf, sizeof(_staticDataBuf),},
+        {COLUMN_DATA_PATH, (uint8_t*)_columnDataBuf, sizeof(_columnDataBuf),},
+        {RELAY_DATA_PATH, (uint8_t*)_relayDataBuf, sizeof(_relayDataBuf),},
+    };
+
+    if (type < 3) {
+        work(__tmp[type].path, __tmp[type].buf, __tmp[type].size);
+    } else if (type == 3) {
+        for (int i = 0; i < 3; i++){
+            work(__tmp[i].path, __tmp[i].buf, __tmp[i].size);
+        }
+    }
+}
+void MachineData::read(int type) {
+    auto readFile = [](const char* path, uint8_t *buf, uint32_t size) {
+        File _file = LittleFS.open(path, "r");
+        _file.seek(0, SeekSet);
+        _file.read(buf, size);
+    };
+    readOrWrite(type, readFile);
+}
+
+void MachineData::flush(int type) {
+    auto writeFile = [](const char* path, uint8_t *buf, uint32_t size) {
+        File _file = LittleFS.open(path, "w");
+        _file.seek(0, SeekSet);
+        _file.write(buf, size);
+    };
+    readOrWrite(type, writeFile);
 }
 
 void MachineData::setStaticData(StaticData id, uint32_t data) {
-    File _file = LittleFS.open(STATIC_DATA_PATH, "r+");
-    _file.seek(4*id, SeekSet);
-    _file.write((uint8_t*)&data, sizeof(data));
-    // _file.flush();
+    _staticDataBuf[id] = data;
 }
 uint32_t MachineData::getStaticData(StaticData id) {
-    uint32_t buf = 0;
-    File _file = LittleFS.open(STATIC_DATA_PATH, "r");
-    _file.seek(4*id, SeekSet);
-    _file.read((uint8_t*)&buf, sizeof(buf));
-    return buf;
-}
-void MachineData::initColumnData(int s, int e) {
-    // std::vector<uint32_t> _init((e-s)*NumofColumnData);
-    uint32_t* _init = new uint32_t[(e-s)*NumofColumnData];
-    int init_idx = 0;
-    for (int i = s; i < e; i++) {
-        _init[init_idx++] = 1;
-        _init[init_idx++] = 0;
-        _init[init_idx++] = 0;
-        _init[init_idx++] = i;
-        _init[init_idx++] = 0;
-        _init[init_idx++] = 0;
-    }
-    File _file = LittleFS.open(COLUMN_DATA_PATH, "r+");
-    _file.seek(4*NumofColumnData*s, SeekSet);
-    _file.write((uint8_t*)_init, 4*NumofColumnData*(e-s));
-    delete _init;
-}
-void MachineData::setColumnBulkChange(ColumnData id, int start, int count, int data) {
-    uint32_t *buf = new uint32_t[NumofColumnData*MaxNumOfColumn];
-    readFile(COLUMN_DATA_PATH, (uint8_t*)buf, sizeof(uint32_t)*NumofColumnData*MaxNumOfColumn);
-    for(int i = start; i < count; i++) {
-        buf[NumofColumnData*i + id] = data;
-    }
-    File _file = LittleFS.open(COLUMN_DATA_PATH, "w");
-    _file.write((uint8_t*)buf, sizeof(uint32_t)*NumofColumnData*MaxNumOfColumn);
-    delete buf;
+    return _staticDataBuf[id];
 }
 void MachineData::setColumnData(int idx, ColumnData id, uint32_t data) {
-    File _file = LittleFS.open(COLUMN_DATA_PATH, "r+");
-    _file.seek(4*NumofColumnData*idx + 4*id, SeekSet);
-    _file.write((uint8_t*)&data, sizeof(data));
-    // _file.flush();
+    _columnDataBuf[NumofColumnData*idx + id] = data;
 }
 uint32_t MachineData::getColumnData(int idx, ColumnData id) {
-    File _file = LittleFS.open(COLUMN_DATA_PATH, "r");
-
-    uint32_t buf = 0;
-    _file.seek(4*NumofColumnData*idx + 4*id, SeekSet);
-    _file.read((uint8_t*)&buf, sizeof(buf));
-    return buf;
+    return _columnDataBuf[NumofColumnData*idx + id];
 }
 void MachineData::setRelayData(int idx, RelayData id, uint32_t data) {
-    File _file = LittleFS.open(RELAY_DATA_PATH, "r+");
-
-    uint32_t buf = 0;
-    _file.seek(4*NumOfRelayData*idx + 4*id, SeekSet);
-    _file.write((uint8_t*)&data, sizeof(data));
-    // _file.flush();
+    _relayDataBuf[NumOfRelayData*idx + id] = data;
 }
 uint32_t MachineData::getRelayData(int idx, RelayData id) {
-    File _file = LittleFS.open(RELAY_DATA_PATH, "r");
-
-    uint32_t buf = 0;
-    _file.seek(4*NumOfRelayData*idx + 4*id, SeekSet);
-    _file.read((uint8_t*)&buf, sizeof(buf));
-    return buf;
+    return _relayDataBuf[NumOfRelayData*idx + id];
 }
 
 //ColumnData
@@ -193,7 +170,14 @@ void MachineData::setNumberOfChannels(int idx, uint32_t data) {
         _s = _e + delta;
     }
 
-    initColumnData(_s, _e);
+    for(int i = _s; i < _e; i += 1) {
+        setMotorType(i, 1);
+        setQuantity(i, 0);
+        setPrice(i, 0);
+        setChannel(i, i);
+        setAdditional(i, 0);
+        setSalesAmount(i, 0);
+    }
     _numberOfColumns += delta;
     setRelayData(idx, NumberOfChannels, data);
 }
@@ -274,7 +258,7 @@ void MachineData::setBanknoteReaderMode(uint32_t mode) {
 void MachineData::setNumberOfRelay(uint32_t number) {
     int delta = number - _numberOfRelays;
     if (delta == 0) {
-        return;
+        // nothing to do
     } else if (delta > 0) { // Increase number of relays
         int _s = _numberOfRelays;
         int _e = number;

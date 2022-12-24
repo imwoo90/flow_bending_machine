@@ -49,6 +49,7 @@ MachineState* SalesInfo::timeout(const int signal) {
     _database->setMoneyOfTotalSales(0);
     _database->setNumberOfManualSales(0);
     _database->setMoneyOfManualSales(0);
+    _database->flush(TypeStaticData);
     _data["param_0"] = "0";
     _data["param_1"] = "0";
     _data["param_2"] = "0";

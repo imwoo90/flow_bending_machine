@@ -11,6 +11,7 @@ bool EnterPasswordOfVendingMachineModeSetting::isMatched(int password) {
 MachineState* EnterPasswordOfVendingMachineModeSetting::decide(int password) {
     if (_isChangePasswords) {
         _database->setPasswordOfVendingMachineModeSetting(password);
+        _database->flush(TypeStaticData);
         return this;
     }
     return VendingMachineModeSetting::getInstance();

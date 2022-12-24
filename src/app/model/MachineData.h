@@ -2,6 +2,7 @@
 
 #include <Arduino.h>
 
+#include <functional>
 //PasswordOfVendingMachineModeSetting too long file name
 // PasswordOfVendingMachineModeSetting - > PasswordOfVMMS
 #define STATIC_DATA\
@@ -47,6 +48,10 @@ typedef enum {
 #undef X
 
 enum {
+    TypeStaticData = 0,
+    TypeColumnData = 1,
+    TypeRelayData = 2,
+    TypeAll = 3,
     NumOfStaticData = NumberOfManualSales + 1,
     NumofColumnData = SalesAmount + 1,
     NumOfRelayData = RelayType + 1,
@@ -59,7 +64,12 @@ private:
     uint32_t _numberOfRelays = 0;
     uint32_t _numberOfColumns = 0;
 
-    void readFile(const char* path, uint8_t *buf, uint32_t size);
+    uint32_t _staticDataBuf[NumOfStaticData];
+    uint32_t _columnDataBuf[NumofColumnData*MaxNumOfColumn];
+    uint32_t _relayDataBuf[NumOfRelayData*MaxNumOfRelay];
+
+    void readOrWrite(int type, std::function<void(const char*, uint8_t *, uint32_t)> _work);
+    void read(int type);
 
     //static length data
     void setStaticData(StaticData pos, uint32_t data);
@@ -70,7 +80,6 @@ private:
     uint32_t getColumnData(int idx, ColumnData pos);
     void setRelayData(int idx, RelayData pos, uint32_t data);
     void setColumnData(int idx, ColumnData pos, uint32_t data);
-    void initColumnData(int s, int e);
 
     MachineData() {}
 public:
@@ -84,8 +93,9 @@ public:
     void defineDefaultsData();
     void initialize();
 
+    void flush(int type);
+
     //ColumnData
-    void setColumnBulkChange(ColumnData id, int start, int count, int data);
     uint32_t getMotorType(int idx);
     uint32_t getQuantity(int idx);
     uint32_t getPrice(int idx);
@@ -132,6 +142,5 @@ public:
     void setNumberOfTotalSales(uint32_t number);
     void setMoneyOfManualSales(uint32_t money);
     void setNumberOfManualSales(uint32_t number);
-
 
 };

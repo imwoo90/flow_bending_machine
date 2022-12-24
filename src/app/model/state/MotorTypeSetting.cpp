@@ -68,7 +68,10 @@ MachineState* MotorTypeSetting::pressKey(const char key) {
             }
 
             //set channel in selected relay
-            _database->setColumnBulkChange(MotorTpye, ch_start, ch_end, motorType);
+            for(int ch = ch_start; ch < ch_end; ch++) {
+                _database->setMotorType(ch, motorType);
+            }
+            _database->flush(TypeColumnData);
             _selection = 0;
             _data["selection"] = "param_0";
         }

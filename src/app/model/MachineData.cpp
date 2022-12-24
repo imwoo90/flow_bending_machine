@@ -105,10 +105,6 @@ void MachineData::setColumnBulkChange(ColumnData id, int start, int count, int d
     delete buf;
 }
 void MachineData::setColumnData(int idx, ColumnData id, uint32_t data) {
-    FSInfo info;
-    LittleFS.info(info);
-    Serial.printf("total %d, used %d", info.totalBytes, info.usedBytes);
-
     File _file = LittleFS.open(COLUMN_DATA_PATH, "r+");
     _file.seek(4*NumofColumnData*idx + 4*id, SeekSet);
     _file.write((uint8_t*)&data, sizeof(data));
@@ -123,10 +119,6 @@ uint32_t MachineData::getColumnData(int idx, ColumnData id) {
     return buf;
 }
 void MachineData::setRelayData(int idx, RelayData id, uint32_t data) {
-    FSInfo info;
-    LittleFS.info(info);
-    Serial.printf("total %d, used %d", info.totalBytes, info.usedBytes);
-
     File _file = LittleFS.open(RELAY_DATA_PATH, "r+");
 
     uint32_t buf = 0;

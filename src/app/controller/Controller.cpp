@@ -265,8 +265,10 @@ void Controller::setup() {
 void Controller::loop() {
     Message msg;
     xQueueReceive(_q, &msg, portMAX_DELAY);
+    _keypad->disablePolling();
     processModel(msg);
     operateDevice(msg);
+    _keypad->enablePolling();
 }
 
 void Controller::processModel(Message &Message) {

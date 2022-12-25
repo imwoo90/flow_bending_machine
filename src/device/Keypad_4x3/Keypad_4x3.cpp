@@ -17,8 +17,7 @@ static void scan_task(void *params) {
     Keypad_4x3* kp = Keypad_4x3::getInstance();
     kp->addEventListener(keypadEvent);
     while(1) {
-        if (kp->_enabled)
-            kp->getKey();
+        kp->getKey();
         delay(50);
     }
 }

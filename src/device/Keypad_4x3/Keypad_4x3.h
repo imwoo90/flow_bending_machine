@@ -10,7 +10,6 @@ private:
     PCF8574 pcf8574;
     Keypad_4x3(char *userKeymap, byte *row, byte *col, byte numRows, byte numCols);
 public:
-    int _enabled = true;
     virtual void pin_mode(byte pinNum, byte mode);
     virtual void pin_write(byte pinNum, boolean level);
     virtual int  pin_read(byte pinNum);
@@ -20,8 +19,6 @@ public:
     void onLED();
     void offLED();
     void subscribe(std::function<void(const KeyState, const char)> callback);
-    void enablePolling() {_enabled = true;}
-    void disablePolling() {_enabled = false;}
 };
 
 

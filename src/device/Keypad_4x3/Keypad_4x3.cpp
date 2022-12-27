@@ -13,16 +13,6 @@ static void keypadEvent(KeypadEvent key){
     }
 }
 
-static void scan_task(void *params) {
-    Keypad_4x3* kp = Keypad_4x3::getInstance();
-    kp->addEventListener(keypadEvent);
-    while(1) {
-        if (kp->_enabled)
-            kp->getKey();
-        delay(50);
-    }
-}
-
 void Keypad_4x3::pin_mode(byte pinNum, byte mode) {
     // pcf8574.pinMode(pinNum, mode);
 }
@@ -34,18 +24,9 @@ int  Keypad_4x3::pin_read(byte pinNum) {
     return read;
 }
 
-void Keypad_4x3::startPolling() {
-    enum {
-        Priority = configMAX_PRIORITIES/2 - 1,
-    };
-
-    static TaskHandle_t _keypadTask;
-    xTaskCreate(scan_task, "KEYPAD_4X3", 1024, 0, Priority, &_keypadTask);
-    vTaskCoreAffinitySet(_keypadTask, 1 << 1);
-}
-
 Keypad_4x3::Keypad_4x3(char *userKeymap, byte *row, byte *col, byte numRows, byte numCols) :
     Keypad(userKeymap, row, col, numRows, numCols), pcf8574(0x20) {
+    addEventListener(keypadEvent);
     for(int r = 0; r < numRows; r++)
         pcf8574.pinMode(row[r], INPUT_PULLUP);
     for(int c = 0 ; c < numCols; c++) {

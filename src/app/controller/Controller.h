@@ -24,6 +24,7 @@ typedef enum {
     MessageRelayOpen,
     MessageRelayClose,
     MessageRunning,
+    MessageKeypadPolling,
     MessageTEST,
 } MessageType;
 

@@ -42,6 +42,7 @@ void MachineData::initialize() {
     }
 
     read(TypeAll);
+    // setStaticData(IsInit, 0);
 
     bool isNotInit = !LittleFS.exists(STATIC_DATA_PATH) || !getStaticData(IsInit)
         || !LittleFS.exists(COLUMN_DATA_PATH) || !LittleFS.exists(RELAY_DATA_PATH);

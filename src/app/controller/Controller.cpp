@@ -177,7 +177,7 @@ int Controller::setupKeypad() {
         it expires. */
         _keypadOffLED
     );
-    _keypad->startPolling();
+    // _keypad->startPolling();
     return 0;
 }
 
@@ -265,10 +265,8 @@ void Controller::setup() {
 void Controller::loop() {
     Message msg;
     xQueueReceive(_q, &msg, portMAX_DELAY);
-    _keypad->disablePolling();
     processModel(msg);
     operateDevice(msg);
-    _keypad->enablePolling();
 }
 
 void Controller::processModel(Message &Message) {
@@ -276,6 +274,7 @@ void Controller::processModel(Message &Message) {
     case MessageInitial:
         _machine->begin(_isInitOk);
         putMessage(MessageRunning, 0);
+        putMessage(MessageKeypadPolling, 0);
         break;
     case MessageKeypadPress:
         _machine->pressKey(Message.data);
@@ -316,6 +315,10 @@ void Controller::operateDevice(Message &Message) {
             running_led = LOW;
         }
         putMessage(MessageRunning, 0, 250);
+        break;
+    case MessageKeypadPolling:
+        _keypad->getKey();
+        putMessage(MessageKeypadPolling, 0, 50);
         break;
     case MessageRelayOpen:{
         int channel = Message.data;

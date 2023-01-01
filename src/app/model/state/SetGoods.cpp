@@ -38,7 +38,7 @@ MachineState* SetGoods::pressKey(const char key) {
         } else if ( _selection == 1) {
             int column = std::stoi(_data["param_0"]) - 1;
             int price = std::stoi(_data["param_1"]);
-            if (price <= 500000) {
+            if (price <= 999000) {
                 _selection = 2;
                 _data["selection"] = "param_2";
             }

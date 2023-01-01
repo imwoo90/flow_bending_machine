@@ -245,10 +245,6 @@ void Controller::setup() {
 
     // Setup device
     delay(1000);
-    if (setupBankNoteReader() < 0) {
-        _isInitOk = false;
-    }
-    delay(1000);
     if (setupKeypad() < 0) {
         _isInitOk = false;
     }
@@ -257,6 +253,9 @@ void Controller::setup() {
         _isInitOk = false;
     }
     delay(1000);
+    if (setupBankNoteReader() < 0) {
+        _isInitOk = false;
+    }
 
     pinMode(22, OUTPUT); //running ld pin number is 22
     //total setup time is 5sec for easy firmware update when running binary is dead right now after started
@@ -275,6 +274,7 @@ void Controller::processModel(Message &Message) {
         _machine->begin(_isInitOk);
         putMessage(MessageRunning, 0);
         putMessage(MessageKeypadPolling, 0);
+        putMessage(MessageBanknoteReaderPolling, 0);
         break;
     case MessageKeypadPress:
         _machine->pressKey(Message.data);
@@ -319,6 +319,10 @@ void Controller::operateDevice(Message &Message) {
     case MessageKeypadPolling:
         _keypad->getKey();
         putMessage(MessageKeypadPolling, 0, 50);
+        break;
+    case MessageBanknoteReaderPolling:
+        _bankNoteReader->notifyBillData();
+        putMessage(MessageBanknoteReaderPolling, 0, 50);
         break;
     case MessageRelayOpen:{
         int channel = Message.data;

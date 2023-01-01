@@ -11,9 +11,7 @@
 class BanknoteReader {
 private:
     std::vector<std::function<void(const int)> > _onRecognizedBankNotes;
-    TaskHandle_t _eventTask;
 public:
-    QueueHandle_t _q;
     std::string _name;
 
     void notifyBillData();

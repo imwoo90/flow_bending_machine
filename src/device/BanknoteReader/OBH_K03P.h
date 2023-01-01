@@ -14,6 +14,7 @@ private:
 
     OBH_K03P() {};
 public:
+    QueueHandle_t _q;
     TimerHandle_t _timer;
     int _cntPulse;
 

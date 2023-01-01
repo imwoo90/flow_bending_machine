@@ -37,27 +37,27 @@ int OBH_K03S::initialized() {
         return -1;
     }
 
-    _serial->setTimeout(ULONG_MAX);
     BanknoteReader::initialized();
     return 0;
 }
 
 int OBH_K03S::getBillData() {
     char _buf[5];
+
     while(1) {
-        if( !_serial->available() ) {
-            delay(50);
-            continue;
+        if (!_serial->available()) {
+            return 0;
         }
 
         if (process(_buf) < 0)
-            continue;
+            return 0;
 
         if (receiveCommnad(_buf, "gb")) { //Receive BillData
             return _buf[3]*1000;
         }
     }
-    return -1;
+
+    return 0;
 }
 
 void OBH_K03S::enable() {

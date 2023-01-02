@@ -2,7 +2,8 @@
 
 static void cntPulse(OBH_K03P* p) {
     xTimerStopFromISR(p->_timer, 0);
-
+    if (p->_cntPulse == 0)
+        p->disable();
     p->_cntPulse += 1;
     xTimerStartFromISR(p->_timer, 0);
 }
@@ -13,12 +14,13 @@ static void billDataEndCallback( TimerHandle_t xTimer ) {
     case 5:
     case 10:
         xQueueSend(p->_q, NULL, 0);
-        break;
+        return;
     default:
-        Serial.println("Banknote Reader recognize error");
+        // Serial.println("Banknote Reader recognize error");
+        break;
     }
-
-    Serial.printf("Banknote count pulse %d\r\n", p->_cntPulse);
+    p->enable();
+    // Serial.printf("Banknote count pulse %d\r\n", p->_cntPulse);
     p->_cntPulse = 0;
 }
 

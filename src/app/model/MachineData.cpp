@@ -90,6 +90,8 @@ void MachineData::flush(int type) {
         File _file = LittleFS.open(path, "w");
         _file.seek(0, SeekSet);
         _file.write(buf, size);
+        _file.flush();
+        _file.close();
     };
     readOrWrite(type, writeFile);
 }

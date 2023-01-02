@@ -67,7 +67,6 @@ MachineState* InputMoney::recognizeBanknote(const int banknote) {
         _database->setQuantity(_column, quantity);
         _database->setNumberOfTotalSales(1 + _database->getNumberOfTotalSales());
         _database->setMoneyOfTotalSales(price + _database->getMoneyOfTotalSales());
-        _database->flush(TypeAll);
         _data["BanknoteReader"] = "disable";
 
         _data["LockerType"] = itoa(_database->getMotorType(_column), buf, 10);
@@ -102,5 +101,9 @@ MachineState* InputMoney::pressKey(const char key) {
 }
 
 MachineState* InputMoney::timeout(const int signal) {
+    int price = _database->getPrice(_column);
+    if (price <= _inputMoney) {
+        _database->flush(TypeAll);
+    }
     return Selling::getInstance();
 }

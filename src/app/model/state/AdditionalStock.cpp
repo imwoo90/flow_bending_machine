@@ -12,6 +12,7 @@ void AdditionalStock::initialize() {
     _data["param_2"] = "00"; // number of goods
     _selection = 0;
     _data["selection"] = "param_0";
+    _isChanged = false;
 }
 
 AdditionalStock* AdditionalStock::getInstance() {
@@ -26,6 +27,8 @@ MachineState* AdditionalStock::pressKey(const char key) {
     MachineState* next = this;
     switch ( key ) {
     case '*':
+        if (_isChanged)
+            _database->flush(TypeColumnData);
         next = SystemSetting::getInstance();
         break;
     case '#':
@@ -45,9 +48,9 @@ MachineState* AdditionalStock::pressKey(const char key) {
             addGoods = std::stoi(_data["param_2"]);
             _database->setAdditional(column, addGoods + _database->getAdditional(column));
             _database->setQuantity(column, addGoods+_database->getQuantity(column));
-            _database->flush(TypeColumnData);
             _selection = 0;
             _data["selection"] = "param_0";
+            _isChanged = true;
         }
         break;
     default: {//1~9

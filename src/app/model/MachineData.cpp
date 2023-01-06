@@ -92,6 +92,7 @@ void MachineData::flush(int type) {
         _file.write(buf, size);
         _file.flush();
         _file.close();
+        delay(100);
     };
     readOrWrite(type, writeFile);
 }

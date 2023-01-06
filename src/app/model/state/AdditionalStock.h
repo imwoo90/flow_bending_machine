@@ -5,7 +5,6 @@
 
 class AdditionalStock : public MachineState {
 private:
-    int _isChanged;
     int _selection;
     AdditionalStock() {}
     virtual void initialize();

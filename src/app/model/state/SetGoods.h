@@ -5,7 +5,6 @@
 
 class SetGoods : public MachineState {
 private:
-    bool _isChanged;
     int _selection;
     SetGoods() {}
     virtual void initialize();

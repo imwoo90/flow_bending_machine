@@ -124,6 +124,10 @@ int Controller::setupMachine() {
         if(data["deinitRelays"] == "Running") {
             deinitRelays();
         }
+
+        if (data["isSelled"] == "OK") {
+            _isSelled = true;
+        }
     };
     auto onTimeoutCallback = [&](const int signal) {
         putMessage(MessageTimeout, signal);
@@ -137,6 +141,10 @@ int Controller::setupMachine() {
 static void _keypadOffLED( TimerHandle_t xTimer ) {
     Keypad_4x3* _keypad = (Keypad_4x3*)pvTimerGetTimerID(xTimer);
     _keypad->offLED();
+}
+static void _flushTimer(TimerHandle_t xTimer) {
+    Controller* _this = (Controller*)pvTimerGetTimerID(xTimer);
+    _this->putMessage(MessageFlush, 0);
 }
 int Controller::setupKeypad() {
     enum {KEYPAD_I2C_SCL = 5, KEYPAD_I2C_SDA = 4, KEYPAD_LED = 3};
@@ -175,6 +183,25 @@ int Controller::setupKeypad() {
         /* Each timer calls the same callback when
         it expires. */
         _keypadOffLED
+    );
+
+    _lastKeyPadReleaseTimer = xTimerCreate
+    ( /* Just a text name, not used by the RTOS
+        kernel. */
+        "flushTimer",
+        /* The timer period in ticks, must be
+        greater than 0. */
+        pdMS_TO_TICKS(10*60*1000),
+        /* The timers will auto-reload themselves
+        when they expire. */
+        pdFALSE,
+        /* The ID is used to store a count of the
+        number of times the timer has expired, which
+        is initialised to 0. */
+        this,
+        /* Each timer calls the same callback when
+        it expires. */
+        _flushTimer
     );
     // _keypad->startPolling();
     return 0;
@@ -284,6 +311,10 @@ void Controller::processModel(Message &Message) {
     case MessageKeypadRelease:
         _machine->releaseKey(Message.data);
         xTimerStart(_keypadOffLedTimer, 0);
+
+        if ( xTimerIsTimerActive(_lastKeyPadReleaseTimer))
+            xTimerStop(_lastKeyPadReleaseTimer, 0);
+        xTimerStart(_lastKeyPadReleaseTimer, 0);
         break;
     case MessageBanknoteRecognize:
         _machine->recognizeBanknote(Message.data);
@@ -334,6 +365,12 @@ void Controller::operateDevice(Message &Message) {
         auto r_ch = convertChannelToRelayFromModel(channel);
         _relays[r_ch.first]->close(r_ch.second);
         Serial.println("relay close");
+        break;
+    } case MessageFlush: {
+        if (_isSelled) {
+            _isSelled = false;
+            _machine->_database->flush(TypeAll);
+        }
         break;
     } default:
         break;

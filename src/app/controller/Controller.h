@@ -26,6 +26,7 @@ typedef enum {
     MessageRunning,
     MessageKeypadPolling,
     MessageBanknoteReaderPolling,
+    MessageFlush,
     MessageTEST,
 } MessageType;
 
@@ -36,9 +37,12 @@ struct Message {
 
 class Controller {
 private:
+    bool _isSelled = false;
+
     int _isInitOk = true;
     QueueHandle_t _q;
     TimerHandle_t _keypadOffLedTimer;
+    TimerHandle_t _lastKeyPadReleaseTimer;
 
     Display* _display;
 

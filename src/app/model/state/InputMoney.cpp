@@ -74,8 +74,11 @@ MachineState* InputMoney::recognizeBanknote(const int banknote) {
         // To do this
         // _data["LEDState"] = quantity ? "on" : "off";
         // _data["LEDChannel"] = "";
-
-        xTimerChangePeriod(_timer, 2*1000, 0);
+        if (_data["LockerType"] == "1") {
+            xTimerChangePeriod(_timer, 2*1000, 0);
+        } else if (_data["LockerType"] == "2") {
+            xTimerChangePeriod(_timer, 8*1000, 0);
+        }
     }
 
     xTimerStart(_timer, 0);
@@ -91,6 +94,11 @@ MachineState* InputMoney::pressKey(const char key) {
     // _data["LEDChannel"] = "";
     switch ( key ) {
     case '*':
+        int price = _database->getPrice(_column);
+        if (price <= _inputMoney) {
+            break;
+        }
+
         if ( xTimerIsTimerActive(_timer) == pdFALSE )
             return this;
         xTimerStop(_timer, 0);
@@ -102,8 +110,5 @@ MachineState* InputMoney::pressKey(const char key) {
 
 MachineState* InputMoney::timeout(const int signal) {
     int price = _database->getPrice(_column);
-    if (price <= _inputMoney) {
-        _database->flush(TypeAll);
-    }
     return Selling::getInstance();
 }

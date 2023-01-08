@@ -70,7 +70,7 @@ int OBH_K03P::initialized() {
         billDataEndCallback
     );
     attachInterrupt(_vendPin, cntPulse, FALLING, this);
-    attachInterrupt(_errorPin, errorOccur, FALLING, this);
+    // attachInterrupt(_errorPin, errorOccur, FALLING, this);
     BanknoteReader::initialized();
     return 0;
 }

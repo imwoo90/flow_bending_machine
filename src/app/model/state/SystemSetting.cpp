@@ -23,6 +23,7 @@ MachineState* SystemSetting::pressKey(const char key) {
     MachineState* next = this;
     switch ( key ) {
     case '*':
+        _database->flush(TypeAll);
         if (StopSelling::isStop()) {
             return StopSelling::getInstance();
         } else {

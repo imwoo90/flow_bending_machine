@@ -71,7 +71,7 @@ MachineState* MotorTypeSetting::pressKey(const char key) {
             for(int ch = ch_start; ch < ch_end; ch++) {
                 _database->setMotorType(ch, motorType);
             }
-            _database->flush(TypeColumnData);
+            // _database->flush(TypeColumnData);
             _selection = 0;
             _data["selection"] = "param_0";
         }

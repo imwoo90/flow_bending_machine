@@ -33,7 +33,7 @@ MachineState* NumberOfRelaySetting::pressKey(const char key) {
             _database->setNumberOfRelay(numOfRelay);
             _data["deinitRelays"] = "Running";
         }
-        _database->flush(TypeAll);
+        // _database->flush(TypeAll);
         break;
     default:{
         std::string &param_0 = _data["param_0"];

@@ -51,7 +51,7 @@ MachineState* NumberOfChannelSetting::pressKey(const char key) {
                 // relay index is i-1 (started zero index)
                 _database->setNumberOfChannels(i-1, numOfChannels);
             }
-            _database->flush(TypeAll);
+            // _database->flush(TypeAll);
             _selection = 0;
             _data["selection"] = "param_0";
             _data["deinitRelays"] = "Running";

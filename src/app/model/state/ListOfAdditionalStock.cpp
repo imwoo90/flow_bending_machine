@@ -47,7 +47,7 @@ MachineState* ListOfAdditionalStock::timeout(const int signal) {
     //Additional of all columns are setted to 0
     for (int column = 0; column < _database->getNumberOfColumns(); column++)
         _database->setAdditional(column, 0);
-    _database->flush(TypeColumnData);
+    // _database->flush(TypeColumnData);
     loadListOfAdditionalStock();
     return this;
 }

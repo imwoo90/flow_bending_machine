@@ -9,7 +9,7 @@ bool EnterPasswordOfAdditionalStock::isMatched(int password) {
 MachineState* EnterPasswordOfAdditionalStock::decide(int password) {
     if (_isChangePasswords) {
         _database->setPasswordOfAdditionalStock(password);
-        _database->flush(TypeStaticData);
+        // _database->flush(TypeStaticData);
         return this;
     }
     return AdditionalStock::getInstance();

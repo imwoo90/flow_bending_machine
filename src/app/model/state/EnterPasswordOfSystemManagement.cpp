@@ -8,7 +8,7 @@ bool EnterPasswordOfSystemManagement::isMatched(int password) {
 MachineState* EnterPasswordOfSystemManagement::decide(int password) {
     if (_isChangePasswords) {
         _database->setPasswordOfSystemManagement(password);
-        _database->flush(TypeStaticData);
+        // _database->flush(TypeStaticData);
         return this;
     }
     return this;

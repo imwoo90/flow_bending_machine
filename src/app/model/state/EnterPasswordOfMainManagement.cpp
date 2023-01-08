@@ -10,7 +10,7 @@ bool EnterPasswordOfMainManagement::isMatched(int password) {
 MachineState* EnterPasswordOfMainManagement::decide(int password) {
     if (_isChangePasswords) {
         _database->setPasswordOfMainManagement(password);
-        _database->flush(TypeStaticData);
+        // _database->flush(TypeStaticData);
         return this;
     }
     return MainManagement::getInstance();

@@ -28,7 +28,7 @@ MachineState* BanknoteReaderModeSetting::pressKey(const char key) {
         mode = std::stoi(_data["param_0"]);
         if ( 0 < mode && mode <= 2) {
             _database->setBanknoteReaderMode(mode);
-            _database->flush(TypeStaticData);
+            // _database->flush(TypeStaticData);
         }
         break;
     default:{

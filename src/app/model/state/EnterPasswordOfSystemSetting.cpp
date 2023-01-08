@@ -10,7 +10,7 @@ bool EnterPasswordOfSystemSetting::isMatched(int password) {
 MachineState* EnterPasswordOfSystemSetting::decide(int password) {
     if (_isChangePasswords) {
         _database->setPasswordOfSystemSetting(password);
-        _database->flush(TypeStaticData);
+        // _database->flush(TypeStaticData);
         return this;
     }
     return SystemSetting::getInstance();

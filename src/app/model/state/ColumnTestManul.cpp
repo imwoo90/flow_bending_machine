@@ -26,10 +26,16 @@ MachineState* ColumnTestManul::pressKey(const char key) {
 
     switch ( key ) {
     case '#':{
+        static unsigned long startTime = 0;
         char buf[32];
         int column = std::stoi(_data["param_0"]) - 1;
         if (0 <= column && column < _database->getNumberOfColumns()) {
-            _data["LockerType"] = itoa(_database->getMotorType(column), buf, 10);
+            std::string locker = itoa(_database->getMotorType(column), buf, 10);
+            if (locker == "2" && (millis() - startTime) < 8000) {
+                break;
+            }
+            startTime = millis();
+            _data["LockerType"] = locker;
             _data["LockerChannel"] = itoa(_database->getChannel(column), buf, 10);
         }
         break;}

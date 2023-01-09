@@ -31,7 +31,11 @@ MachineState* ColumnTestSection::systemMessage(const SystemMessage mgs) {
         _data["LockerChannel"] = itoa(_database->getChannel(_column), buf, 10);
         if (_column < column_e) {
             _data["sysMsg"] = "DelayCall";
-            _data["sysMsgArg_0"] = "1000"; // Delay 1000ms for DelayCall systemMessage
+            if (_data["LockerType"] == "1") {
+                _data["sysMsgArg_0"] = "1000"; // Delay 1000ms for DelayCall systemMessage
+            } else if (_data["LockerType"] == "2") {
+                _data["sysMsgArg_0"] = "8000"; // Delay 8000ms for DelayCall systemMessage
+            }
         } else {
             _running_test = false;
         }

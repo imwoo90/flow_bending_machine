@@ -105,6 +105,7 @@ int Controller::setupMachine() {
         } else if(data["LockerType"] == "2") { // relay (mortor)
             channel_swMotorInterrupt = std::stoi(data["LockerChannel"]);
             putMessage(MessageRelayOpen, channel_swMotorInterrupt);
+            putMessage(MessageRelayClose, channel_swMotorInterrupt, 7000);
             // The motorRoundCallback must be called after above code is working
         }
 
